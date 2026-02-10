@@ -1,6 +1,6 @@
 'use client'
 
-import { SignupForm } from "@/components/signup-form"
+import { SignupForm } from "@/components/forms/signup-form"
 import { createBrowserSupabase } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -11,13 +11,16 @@ export default function SignupPage() {
 
     const [error, setError] = useState<string | undefined>();
 
-    async function handleSignup(email: string, password: string) {
+    async function handleSignup(email: string, username: string, password: string) {
       const { data, error } = await supabase.auth.signUp({
-        email: email,
-        password: password,
+        email,
+        password,
+        options: {
+          data: {
+            username
+          }
+        }
       })
-
-      console.log('data: ', data);
 
       if (data?.user) {
         router.push('/dashboard');

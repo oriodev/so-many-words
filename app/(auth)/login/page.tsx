@@ -1,6 +1,6 @@
 'use client'
 
-import { LoginForm } from "@/components/login-form"
+import { LoginForm } from "@/components/forms/login-form"
 import { createBrowserSupabase } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { useState } from "react"

@@ -1,6 +1,6 @@
 import { render, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { LoginForm } from "@/components/login-form";
+import { LoginForm } from "@/components/forms/login-form";
 
 /**
  * tests for the Login Form Component

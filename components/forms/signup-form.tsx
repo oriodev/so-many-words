@@ -6,13 +6,12 @@ import {
   FieldDescription,
   FieldGroup,
   FieldLabel,
-  FieldSeparator,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 
 
 interface SignupFormProps extends React.ComponentProps<"div"> {
-  handleSignup: (email: string, password: string) => void;
+  handleSignup: (email: string, username: string, password: string) => void;
   error: string | undefined;
 }
 
@@ -28,9 +27,10 @@ export function SignupForm({
 
     const formData = new FormData(e.currentTarget);
     const email = formData.get('email') as string;
+    const username = formData.get('username') as string;
     const password = formData.get('password') as string;
 
-    handleSignup(email, password);
+    handleSignup(email, username, password);
   }
 
   return (
@@ -59,6 +59,17 @@ export function SignupForm({
                   email with anyone else.
                 </FieldDescription>
               </Field>
+
+              <Field>
+                <FieldLabel htmlFor="username">Username</FieldLabel>
+                <Input
+                  id="username"
+                  type="username"
+                  name="username"
+                  required
+                />
+              </Field>
+
               <Field>
                 <Field className="grid grid-cols-2 gap-4">
                   <Field>

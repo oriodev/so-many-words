@@ -1,8 +1,7 @@
 'use client'
 
-import { ResetPasswordForm } from "@/components/reset-password-form";
+import { ResetPasswordForm } from "@/components/forms/reset-password-form";
 import { createBrowserSupabase } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
 import { useState } from "react"
 
 export default function PasswordReset() {
@@ -12,7 +11,7 @@ export default function PasswordReset() {
   async function handlePasswordReset(
     new_password: string, 
   ) {
-    const { data, error } = await supabase.auth.updateUser({
+    const { error } = await supabase.auth.updateUser({
       password: new_password
     })
 

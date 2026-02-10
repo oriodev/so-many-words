@@ -16,29 +16,27 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { MoreHorizontalIcon, FolderIcon, ShareIcon, Trash2Icon } from "lucide-react"
+import { Project } from "@/types"
+import { MoreHorizontalIcon, FolderIcon, ShareIcon, Trash2Icon, Book } from "lucide-react"
 
 export function NavDocuments({
-  items,
+  projects,
 }: {
-  items: {
-    name: string
-    url: string
-    icon: React.ReactNode
-  }[]
+  projects: Project[]
 }) {
   const { isMobile } = useSidebar()
+  const numOfProjects = projects.length;
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-      <SidebarGroupLabel>Documents</SidebarGroupLabel>
+      <SidebarGroupLabel>Projects ({numOfProjects})</SidebarGroupLabel>
       <SidebarMenu>
-        {items.map((item) => (
-          <SidebarMenuItem key={item.name}>
-            <SidebarMenuButton asChild>
-              <a href={item.url}>
-                {item.icon}
-                <span>{item.name}</span>
+        {projects.map((project) => (
+          <SidebarMenuItem key={project.title}>
+            <SidebarMenuButton asChild tooltip={project.title}>
+              <a href={`/projects/project/${project.slug}`}>
+                <Book />
+                <span>{project.title}</span>
               </a>
             </SidebarMenuButton>
             <DropdownMenu>

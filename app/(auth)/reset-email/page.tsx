@@ -7,13 +7,12 @@ import { useState } from "react"
 
 export default function PasswordResetEmail() {
   const supabase = createBrowserSupabase();
-  const router = useRouter();
   const [error, setError] = useState<string | undefined>();
 
   async function handleSendPasswordResetEmail(
     email: string, 
   ) {
-    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${process.env.BASE_URL}/reset-password`
     })
 

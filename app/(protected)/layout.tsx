@@ -1,11 +1,25 @@
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { createClient } from "@/lib/supabase/server";
+import { getUser } from "@/lib/user.utils";
+import { Project, User } from "@/types";
+import { redirect } from "next/navigation";
 
-const ProtectedLayout = ({
+const ProtectedLayout = async ({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
+    const user = await getUser();
+    if (!user) redirect('/login');
+    
+    let projects: Project[] = [];
+    const projectUrl = `${process.env.BASE_URL}/api/projects/${user.id}`;
+    const fetchedProjects = await fetch(projectUrl);
+    if (fetchedProjects.status === 200) {
+      projects = await fetchedProjects.json();
+    }
+
     return (
         <div>
           <SidebarProvider
@@ -16,7 +30,7 @@ const ProtectedLayout = ({
               } as React.CSSProperties
             }
           >
-            <AppSidebar variant="inset" />
+            <AppSidebar variant="inset" user={user} projects={projects}/>
               <SidebarInset>
                 {children}
               </SidebarInset>
