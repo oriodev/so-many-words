@@ -1,6 +1,6 @@
 'use client'
 
-import { SendPasswordResetEmailForm } from "@/components/send-password-reset-email-form";
+import { SendPasswordResetEmailForm } from "@/components/forms/send-password-reset-email-form";
 import { createBrowserSupabase } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { useState } from "react"
