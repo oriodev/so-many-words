@@ -13,7 +13,7 @@ export default async function CreateProject() {
     
     const { title, description } = data;
 
-    const response = await fetch(`${process.env.BASE_URL}/api/projects/${user.id}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/projects/${user.id}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ title, description }),

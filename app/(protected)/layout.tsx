@@ -14,7 +14,7 @@ const ProtectedLayout = async ({
     if (!user) redirect('/login');
     
     let projects: Project[] = [];
-    const projectUrl = `${process.env.BASE_URL}/api/projects/${user.id}`;
+    const projectUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/projects/${user.id}`;
     const fetchedProjects = await fetch(projectUrl);
     if (fetchedProjects.status === 200) {
       projects = await fetchedProjects.json();

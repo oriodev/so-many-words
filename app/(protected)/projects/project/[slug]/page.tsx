@@ -11,7 +11,7 @@ export default async function ProjectPage(
   const user = await getUser();
   if (!user) redirect('/login');
 
-  const projectUrl = `${process.env.BASE_URL}/api/projects/${user.id}/${slug}`;
+  const projectUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/projects/${user.id}/${slug}`;
   const fetchedProject = await fetch(projectUrl);
   if (!fetchedProject) redirect('/dashboard');
 

@@ -13,7 +13,7 @@ export default function PasswordResetEmail() {
     email: string, 
   ) {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${process.env.BASE_URL}/reset-password`
+      redirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/reset-password`
     })
 
     if (error) {
