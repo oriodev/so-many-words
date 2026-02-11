@@ -19,7 +19,9 @@ import {
   InputGroupText,
   InputGroupTextarea,
 } from "@/components/ui/input-group"
-import { ProjectSchema } from "@/types"
+import { createProject } from "@/lib/project.utils"
+import { useRouter } from "next/navigation"
+import { Project } from "@/types"
 
 const formSchema = z.object({
   title: z
@@ -31,9 +33,7 @@ const formSchema = z.object({
     .max(200, "Description must be at most 200 characters."),
 })
 
-export function CreateProjectForm(
-  { handleCreateProject }
-  : { handleCreateProject: (data: ProjectSchema) => Promise<void> } ) {
+export function CreateProjectForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -42,9 +42,15 @@ export function CreateProjectForm(
     },
   })
 
+  const router = useRouter();
+
   async function onSubmit(data: z.infer<typeof formSchema>) {
     console.log('data: ', data);
-    await handleCreateProject(data);
+    const project = await createProject(data) as Project | null;
+    if (project) {
+      router.push(`/projects/project/${project.slug}`);
+    }
+
   }
 
   return (

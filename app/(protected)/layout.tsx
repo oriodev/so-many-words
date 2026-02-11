@@ -1,6 +1,5 @@
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { createClient } from "@/lib/supabase/server";
 import { getUser } from "@/lib/user.utils";
 import { Project, User } from "@/types";
 import { redirect } from "next/navigation";

@@ -40,20 +40,21 @@ export async function POST(
       .insert([
         { title, description, user_id: userId  },
       ])
-      .select()
+      .select();
       
 
-    console.log('error: ', error);
-    console.log('data: ', data);
-
     if (error) {
+      console.log('THERE WAS AN ERROR')
+      console.log('error: ', error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
+    console.log('data: ', data);
     return NextResponse.json({ data }, { status: 200 });
     
   } catch (error) {
-    return NextResponse.json({ error })
+    console.error('Unexpected error:', error);
+    return NextResponse.json({ error: 'An unexpected error occurred' }, { status: 500 });
   }
 }
 

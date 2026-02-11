@@ -1,7 +1,8 @@
+import ProjectTabs from "@/components/project-tabs";
 import { SiteHeader } from "@/components/site-header";
+import { getProject } from "@/lib/project.utils";
 import { getUser } from "@/lib/user.utils";
 import { redirect } from "next/navigation";
-import { NextRequest } from "next/server";
 
 export default async function ProjectPage(
   { params }: { params: Promise<{ slug: string }> }
@@ -11,15 +12,13 @@ export default async function ProjectPage(
   const user = await getUser();
   if (!user) redirect('/login');
 
-  const projectUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/projects/${user.id}/${slug}`;
-  const fetchedProject = await fetch(projectUrl);
-  if (!fetchedProject) redirect('/dashboard');
-
-  const project = (await fetchedProject.json())[0];
+  const project = await getProject(user.id, slug);
+  if (!project) redirect('/dashboard');
 
   return (
     <div>
       <SiteHeader title={project.title}/>
+      <ProjectTabs userId={user.id} slug={slug} />
     </div>
   )
 }
