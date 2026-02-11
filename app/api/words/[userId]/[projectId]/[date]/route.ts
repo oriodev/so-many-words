@@ -55,7 +55,7 @@ export async function DELETE(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ userId: string, projectId: string, date: string, words: WordsSchema }> }
+  { params }: { params: Promise<{ userId: string, projectId: string, date: string }> }
 ) {
   try {
 
