@@ -20,6 +20,8 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { deleteProject } from "@/lib/project.utils";
+import { redirect } from "next/navigation";
+import { useProjectsStore } from "@/lib/providers/projects-store-provider";
 
 interface ProjectTabsProps {
   userId: string;
@@ -27,6 +29,17 @@ interface ProjectTabsProps {
 }
 
 export default function ProjectTabs ({ userId, slug }: ProjectTabsProps) {
+
+  const { deleteProject: deleteProjectFromStore } = useProjectsStore((state) => state);
+
+  const handleDelete = async () => {
+    const response = await deleteProject(userId, slug);
+    if (!response) return;
+    deleteProjectFromStore(slug);
+    
+    redirect('/dashboard');
+  }
+
   return (
     <Tabs defaultValue="overview" className="p-5">
         <TabsList variant={'line'}>
@@ -64,7 +77,7 @@ export default function ProjectTabs ({ userId, slug }: ProjectTabsProps) {
               <AlertDialogFooter>
                 <AlertDialogCancel>Nooo I take it back</AlertDialogCancel>
                 <AlertDialogAction
-                  onClick={() => deleteProject(userId, slug)}
+                  onClick={handleDelete}
                 >Delete</AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>

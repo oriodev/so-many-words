@@ -22,6 +22,7 @@ import {
 import { createProject } from "@/lib/project.utils"
 import { useRouter } from "next/navigation"
 import { Project } from "@/types"
+import { useProjectsStore } from "@/lib/providers/projects-store-provider"
 
 const formSchema = z.object({
   title: z
@@ -43,11 +44,13 @@ export function CreateProjectForm() {
   })
 
   const router = useRouter();
+  const { addProject } = useProjectsStore((state) => state);
+  
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
-    console.log('data: ', data);
     const project = await createProject(data) as Project | null;
     if (project) {
+      addProject(project);
       router.push(`/projects/project/${project.slug}`);
     }
 

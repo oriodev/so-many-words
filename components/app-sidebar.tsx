@@ -18,6 +18,8 @@ import {
 import { LayoutDashboardIcon, ListIcon, ChartBarIcon, FolderIcon, UsersIcon, CameraIcon, FileTextIcon, Settings2Icon, CircleHelpIcon, SearchIcon, DatabaseIcon, FileChartColumnIcon, FileIcon, CommandIcon, SquareLibrary } from "lucide-react"
 import { Project, User } from "@/types"
 import { ModeToggle } from "./theme-toggle"
+import { useProjectsStore } from "@/lib/providers/projects-store-provider"
+import { useEffect } from "react"
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   user: User;
@@ -27,30 +29,37 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
 export function AppSidebar(
   { user, projects, ...props }: AppSidebarProps) 
 {
+  const { projects: ProjectsFromStore, setProjects } = useProjectsStore((state) => state);
+  
+  useEffect(() => {
+    if (ProjectsFromStore.length === 0) {
+      setProjects(projects);
+    }
+  }, [])
 
   const data = {
-  navMain: [
-    {
-      title: "Dashboard",
-      url: "#",
-      icon: (
-        <LayoutDashboardIcon
-        />
-      ),
-    },
-  ],
-  navSecondary: [
-    {
-      title: "Settings",
-      url: "#",
-      icon: (
-        <Settings2Icon
-        />
-      ),
-    },
-  ],
-  projects: projects || []
-}
+    navMain: [
+      {
+        title: "Dashboard",
+        url: "#",
+        icon: (
+          <LayoutDashboardIcon
+          />
+        ),
+      },
+    ],
+    navSecondary: [
+      {
+        title: "Settings",
+        url: "#",
+        icon: (
+          <Settings2Icon
+          />
+        ),
+      },
+    ],
+    projects: ProjectsFromStore || []
+  }
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>

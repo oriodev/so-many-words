@@ -5,10 +5,25 @@ import { redirect } from "next/navigation";
 import { getUser } from "./user.utils";
 
 /**
+ * Gets all projects given a user id. Returns [] on failure.
+ * @param userId string
+ * @returns Project[] or []
+ */
+export const getProjects = async (userId: string): Promise<Project[]> => {
+  const projectUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/projects/${userId}`;
+  const fetchedProjects = await fetch(projectUrl);
+
+  if (!fetchedProjects.ok) return [] as Project[];
+
+  const projects: Project[] = await fetchedProjects.json();
+  return projects;
+}
+
+/**
  * Gets a project given a user id and project slug
  * @param userId 
  * @param slug 
- * @returns 
+ * @returns Project
  */
 export const getProject = async (userId: string, slug: string): Promise<Project | null> => {
   const projectUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/projects/${userId}/${slug}`;
@@ -50,7 +65,7 @@ export const createProject = async (data: ProjectSchema): Promise<void | null> =
  * @param slug string
  * @returns 
  */
-export const deleteProject = async (userId: string, slug: string) => {
+export const deleteProject = async (userId: string, slug: string): Promise<void | null> => {
   const deleteUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/projects/${userId}/${slug}`;
   const response = await fetch(deleteUrl, {
     method: "DELETE",
@@ -62,9 +77,10 @@ export const deleteProject = async (userId: string, slug: string) => {
   if (!response.ok) {
     const error = await response.json();
     console.log('Delete Error: ', error);
-    return error;
+    return null;
   }
 
-  redirect('/dashboard');
+  const returnResponse = await response.json();
+  return returnResponse;
 
 }

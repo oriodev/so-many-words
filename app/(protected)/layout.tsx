@@ -1,7 +1,7 @@
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { getProjects } from "@/lib/project.utils";
 import { getUser } from "@/lib/user.utils";
-import { Project, User } from "@/types";
 import { redirect } from "next/navigation";
 
 const ProtectedLayout = async ({
@@ -12,12 +12,7 @@ const ProtectedLayout = async ({
     const user = await getUser();
     if (!user) redirect('/login');
     
-    let projects: Project[] = [];
-    const projectUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/projects/${user.id}`;
-    const fetchedProjects = await fetch(projectUrl);
-    if (fetchedProjects.status === 200) {
-      projects = await fetchedProjects.json();
-    }
+    const projects = await getProjects(user.id);
 
     return (
         <div>
