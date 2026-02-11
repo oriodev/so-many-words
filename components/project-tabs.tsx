@@ -40,8 +40,12 @@ export default function ProjectTabs ({ userId, slug }: ProjectTabsProps) {
     redirect('/dashboard');
   }
 
+  const handleEdit = async () => {
+    redirect(`/projects/project/${slug}/edit`);
+  }
+
   return (
-    <Tabs defaultValue="overview" className="p-5">
+    <Tabs defaultValue="overview">
         <TabsList variant={'line'}>
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
@@ -49,40 +53,47 @@ export default function ProjectTabs ({ userId, slug }: ProjectTabsProps) {
         </TabsList>
 
         {/* OVERVIEW */}
-        <TabsContent value="overview" className="pt-5">
+        <TabsContent value="overview" className="pt-5 pl-2">
           <h2>Coming Soon</h2>
         </TabsContent>
 
         {/* ANALYTICS */}
-        <TabsContent value="analytics" className="pt-5">
+        <TabsContent value="analytics" className="pt-5 pl-2">
           <h2>Coming Soon</h2>
         </TabsContent>
 
         {/* SETTINIGS */}
-        <TabsContent value="settings" className="pt-5 flex flex-col gap-5">
+        <TabsContent value="settings" className="pt-5 pl-2 flex flex-col gap-5">
           <Separator />
 
-          {/* DELETE DIALOG */}
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant={'destructive'} className="hover:cursor-pointer">Delete Project</Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This will permanently delete your project from our servers.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Nooo I take it back</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={handleDelete}
-                >Delete</AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-            
+          <div className="flex gap-2">
+
+            <Button onClick={handleEdit}>Edit Project</Button>
+
+            {/* DELETE DIALOG */}
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant={'destructive'}>Delete Project</Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will permanently delete your project from our servers.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Nooo I take it back</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleDelete}
+                  >Delete</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+
+          </div>
+
+ 
         </TabsContent>
       </Tabs>
   )

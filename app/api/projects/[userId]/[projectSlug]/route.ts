@@ -50,3 +50,31 @@ export async function DELETE(
   }
 
 }
+
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ userId: string, projectSlug: string }> }
+) {
+  try {
+
+    const { userId, projectSlug } = await params;
+    const { project } = await request.json();
+    const { title, description } = project;
+
+    const supabase = await createClient();
+
+    const { data, error } = await supabase
+      .from('projects')
+      .update({ title, description })
+      .eq('user_id', userId)
+      .eq('slug', projectSlug)
+      .select()
+
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+    return NextResponse.json({ data }, { status: 200 });
+    
+  } catch (error) {
+    return NextResponse.json({ error })
+  }
+}

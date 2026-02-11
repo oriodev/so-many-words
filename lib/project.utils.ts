@@ -59,6 +59,26 @@ export const createProject = async (data: ProjectSchema): Promise<void | null> =
   
 }
 
+export const editProject = async (userId: string, slug: string, project: ProjectSchema): Promise<void | null> => {
+  const editUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/projects/${userId}/${slug}`;
+  const response = await fetch(editUrl, {
+    method: "PUT",
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ project })
+  })
+
+  if (!response.ok) {
+    const error = await response.json();
+    console.log('Edit Error: ', error);
+    return null;
+  }
+
+  const returnResponse = (await response.json())['data'][0];
+  return returnResponse;
+}
+
 /**
  * Deletes a project given a user ID and string
  * @param userId string

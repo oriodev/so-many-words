@@ -61,10 +61,10 @@ export default function Home() {
 
         <div className="flex gap-5">
           <Link href={'/login'}>
-            <Button size={'lg'} className="hover:cursor-pointer">Log In</Button>
+            <Button size={'lg'}>Log In</Button>
           </Link>
           <Link href={'/signup'}>
-            <Button size={'lg'} className="hover:cursor-pointer">Sign Up</Button>
+            <Button size={'lg'}>Sign Up</Button>
           </Link>
         </div>
       </div>
