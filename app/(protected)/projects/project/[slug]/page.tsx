@@ -19,11 +19,11 @@ export default async function ProjectPage(
     <div>
       <SiteHeader title={project.title}/>
       <div className="p-5 flex flex-col gap-2">
-        <div className="pl-3 flex flex-col gap-2">
+        <div className="pl-3 pb-5 flex flex-col gap-2">
           <h2 className="text-xl font-bold">{project.title}</h2>
           <p className="text-sm italic">{project.description}</p>
         </div>
-        <ProjectTabs userId={user.id} slug={slug} />
+        <ProjectTabs userId={user.id} project={project} />
       </div>
     </div>
   )

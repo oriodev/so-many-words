@@ -29,7 +29,7 @@ export async function POST(
   try {
 
     const { userId } = await params;
-    const { title, description } = await request.json();
+    const { title, description, wordcountGoal, projectStartDate, projectEndDate } = await request.json();
 
     if (!title) return NextResponse.json({ error: "Title required"});
 
@@ -38,11 +38,15 @@ export async function POST(
     const { data, error } = await supabase
       .from('projects')
       .insert([
-        { title, description, user_id: userId  },
+        { title, 
+          description, 
+          wordcount_goal: wordcountGoal, 
+          project_start_date: projectStartDate, 
+          project_end_date: projectEndDate, 
+          user_id: userId  },
       ])
       .select();
       
-
     if (error) {
       console.log('THERE WAS AN ERROR')
       console.log('error: ', error);

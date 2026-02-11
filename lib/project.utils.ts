@@ -1,7 +1,6 @@
 'use server'
 
 import { Project, ProjectSchema } from "@/types";
-import { redirect } from "next/navigation";
 import { getUser } from "./user.utils";
 
 /**
@@ -31,7 +30,15 @@ export const getProject = async (userId: string, slug: string): Promise<Project 
   if (!fetchedProject) return null;
 
   const project = (await fetchedProject.json())[0];
-  return project;
+  return {
+    title: project.title,
+    description: project.description,
+    slug,
+    wordcountGoal: project.wordcount_goal,
+    projectStartDate: project.project_start_date,
+    projectEndDate: project.project_end_date,
+    createdAt: project.created_at
+  };
 }
 
 /**
@@ -42,12 +49,12 @@ export const createProject = async (data: ProjectSchema): Promise<void | null> =
   const user = await getUser();
   if (!user) return null;
 
-  const { title, description } = data;
+  const { title, description, wordcountGoal, projectStartDate, projectEndDate } = data;
 
   const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/projects/${user.id}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ title, description }),
+    body: JSON.stringify({ title, description, wordcountGoal, projectStartDate, projectEndDate }),
   });
 
   if (!response.ok) {

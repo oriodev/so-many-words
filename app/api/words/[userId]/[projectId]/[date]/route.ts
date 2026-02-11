@@ -1,43 +1,45 @@
-// app/api/projects/[userId]/[projectId/route.ts
 import { createClient } from "@/lib/supabase/server";
-import { NextRequest, NextResponse } from 'next/server';
+import { WordsSchema } from "@/types";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ userId: string, projectSlug: string }> }
+  { params }: { params: Promise<{ userId: string, projectId: string, date: string }> }
 ) {
   const supabase = await createClient();
-  const { userId, projectSlug } = await params;
+  const { userId, projectId, date } = await params;
 
-  const { data: project, error } = await supabase
-    .from("projects")
+  const { data: words, error } = await supabase
+    .from("words")
     .select('*')
     .eq('user_id', userId)
-    .eq('slug', projectSlug);
+    .eq('project_id', projectId)
+    .eq('date', new Date(date))
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json(project);
+  return NextResponse.json(words);
 }
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ userId: string, projectSlug: string }> }
+  { params }: { params: Promise<{ userId: string, projectId: string, date: string }> }
 ) {
 
   try {
 
-    const { userId, projectSlug } = await params;
+    const { userId, projectId, date } = await params;
 
     const supabase = await createClient();
 
     const { error } = await supabase
-      .from('projects')
+      .from('words')
       .delete()
       .eq('user_id', userId)
-      .eq('slug', projectSlug);
+      .eq('project_id', projectId)
+      .eq('date', new Date(date));
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
@@ -53,27 +55,22 @@ export async function DELETE(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ userId: string, projectSlug: string }> }
+  { params }: { params: Promise<{ userId: string, projectId: string, date: string, words: WordsSchema }> }
 ) {
   try {
 
-    const { userId, projectSlug } = await params;
-    const { project } = await request.json();
-    const { title, description, wordcountGoal, projectStartDate, projectEndDate } = project;
+    const { userId, projectId, date } = await params;
+    const { words } = await request.json();
+    const { wordcount } = words;
 
     const supabase = await createClient();
 
     const { data, error } = await supabase
-      .from('projects')
-      .update(
-        { title, 
-          description,
-          wordcount_goal: wordcountGoal, 
-          project_start_date: projectStartDate, 
-          project_end_date: projectEndDate, 
-        })
+      .from('words')
+      .update({ wordcount })
       .eq('user_id', userId)
-      .eq('slug', projectSlug)
+      .eq('project_id', projectId)
+      .eq('date', new Date(date))
       .select()
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });

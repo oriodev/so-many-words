@@ -19,18 +19,25 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+
 import { deleteProject } from "@/lib/project.utils";
 import { redirect } from "next/navigation";
 import { useProjectsStore } from "@/lib/providers/projects-store-provider";
+import { Project } from "@/types";
+import { getDuration, getWordsPerDay } from "@/lib/utils";
+import ProjectGoalsCard from "./cards/project-goals-card";
+import ProjectProgressCard from "./cards/project-progress-card";
+import DailyProgressCard from "./cards/daily-progress.card";
 
 interface ProjectTabsProps {
   userId: string;
-  slug: string;
+  project: Project;
 }
 
-export default function ProjectTabs ({ userId, slug }: ProjectTabsProps) {
+export default function ProjectTabs ({ userId, project }: ProjectTabsProps) {
 
   const { deleteProject: deleteProjectFromStore } = useProjectsStore((state) => state);
+  const { slug, wordcountGoal, projectStartDate, projectEndDate } = project;
 
   const handleDelete = async () => {
     const response = await deleteProject(userId, slug);
@@ -44,6 +51,9 @@ export default function ProjectTabs ({ userId, slug }: ProjectTabsProps) {
     redirect(`/projects/project/${slug}/edit`);
   }
 
+  const durationDays = getDuration(projectStartDate, projectEndDate);
+  const wordsPerDay = getWordsPerDay(wordcountGoal, durationDays);
+
   return (
     <Tabs defaultValue="overview">
         <TabsList variant={'line'}>
@@ -53,8 +63,12 @@ export default function ProjectTabs ({ userId, slug }: ProjectTabsProps) {
         </TabsList>
 
         {/* OVERVIEW */}
-        <TabsContent value="overview" className="pt-5 pl-2">
-          <h2>Coming Soon</h2>
+        <TabsContent value="overview" className="flex flex-col gap-5 pt-5 pl-2">
+          <div className="w-full flex flex-col lg:flex-row gap-5">
+            <ProjectGoalsCard projectStartDate={projectStartDate} projectEndDate={projectEndDate} wordcountGoal={wordcountGoal} durationDays={durationDays} wordsPerDay={wordsPerDay} />
+            <ProjectProgressCard />
+          </div>
+          <DailyProgressCard project={project} userId={userId}/>
         </TabsContent>
 
         {/* ANALYTICS */}

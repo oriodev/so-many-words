@@ -1,36 +1,45 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+### Cool SQL Stuff
 
-## Getting Started
 
-First, run the development server:
+```
+-- updates the total_words_written property on projects when wordcount is updated
+CREATE OR REPLACE FUNCTION update_total_words_written()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF TG_OP = 'INSERT' THEN
+        -- Adding new words
+        UPDATE projects
+        SET total_words_written = total_words_written + NEW.word_count
+        WHERE id = NEW.project_id;
+    ELSIF TG_OP = 'UPDATE' THEN
+        -- Updating existing words
+        UPDATE projects
+        SET total_words_written = total_words_written - OLD.word_count + NEW.word_count
+        WHERE id = OLD.project_id;
+    ELSIF TG_OP = 'DELETE' THEN
+        -- Removing words
+        UPDATE projects
+        SET total_words_written = total_words_written - OLD.word_count
+        WHERE id = OLD.project_id;
+    END IF;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+-- triggers the update_total_words_written function on insert/update/delete
+CREATE TRIGGER words_insert_trigger
+AFTER INSERT ON words
+FOR EACH ROW EXECUTE FUNCTION update_total_words_written();
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+CREATE TRIGGER words_update_trigger
+AFTER UPDATE ON words
+FOR EACH ROW EXECUTE FUNCTION update_total_words_written();
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+CREATE TRIGGER words_delete_trigger
+AFTER DELETE ON words
+FOR EACH ROW EXECUTE FUNCTION update_total_words_written();
+```

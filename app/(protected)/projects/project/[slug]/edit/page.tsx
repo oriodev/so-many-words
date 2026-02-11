@@ -17,7 +17,11 @@ export default async function EditPage (
 
   return (
     <div>
-      <SiteHeader title={`Edit ${project.title}`} />
+      <SiteHeader
+        title={`Edit ${project.title}`} 
+        backBtnText={`Return to ${project.title}`}
+        backBtnUrl={`/projects/project/${project.slug}`}
+      />
       <EditProjectForm project={project} userId={user.id} slug={slug}/>
     </div>
   )
