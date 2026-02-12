@@ -18,6 +18,8 @@ function Progress({
       if (value < 100) return 'bg-blue-300'; 
       return 'bg-cyan-200'; 
     };
+
+    const clampedValue = Math.min(Math.max(value || 0, 0), 100);
   
   return (
     <ProgressPrimitive.Root
@@ -31,7 +33,7 @@ function Progress({
       <ProgressPrimitive.Indicator
         data-slot="progress-indicator"
         className={`${value ? getColorClass(value) : 'bg-cyan-200'} size-full flex-1 transition-all`}
-        style={{ transform: `translateX(-${100 - (value || 0)}%)` }}
+        style={{ transform: `translateX(-${100 - (clampedValue || 0)}%)` }}
       />
     </ProgressPrimitive.Root>
   )

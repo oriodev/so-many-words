@@ -31,13 +31,15 @@ export const getProject = async (userId: string, slug: string): Promise<Project 
 
   const project = (await fetchedProject.json())[0];
   return {
+    id: project.id,
     title: project.title,
     description: project.description,
     slug,
     wordcountGoal: project.wordcount_goal,
     projectStartDate: project.project_start_date,
     projectEndDate: project.project_end_date,
-    createdAt: project.created_at
+    createdAt: project.created_at,
+    totalWordsWritten: project.total_words_written
   };
 }
 

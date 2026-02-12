@@ -23,18 +23,23 @@ import {
 import { deleteProject } from "@/lib/project.utils";
 import { redirect } from "next/navigation";
 import { useProjectsStore } from "@/lib/providers/projects-store-provider";
-import { Project } from "@/types";
-import { getDuration, getWordsPerDay } from "@/lib/utils";
+import { AllProjectData, Project, Words } from "@/types";
+import { getActualDailyWordcounts, getDaysRemaining, getDuration, getPercentageCompleted, getProjectedDailyWordcounts, getWordsLeftToWrite, getWordsPerDay } from "@/lib/utils";
 import ProjectGoalsCard from "./cards/project-goals-card";
 import ProjectProgressCard from "./cards/project-progress-card";
 import DailyProgressCard from "./cards/daily-progress.card";
+import { useState } from "react";
+import DailyProgressChartCard from "./cards/daily-progress-chart-card";
 
 interface ProjectTabsProps {
   userId: string;
   project: Project;
+  allWordcounts: Words[];
 }
 
-export default function ProjectTabs ({ userId, project }: ProjectTabsProps) {
+export default function ProjectTabs ({ userId, project, allWordcounts }: ProjectTabsProps) {
+  const [wordCounts, setWordCounts] = useState<Words[]>(allWordcounts);
+  const [totalWordsWritten, setTotalWordsWritten] = useState<number>(project.totalWordsWritten);
 
   const { deleteProject: deleteProjectFromStore } = useProjectsStore((state) => state);
   const { slug, wordcountGoal, projectStartDate, projectEndDate } = project;
@@ -52,7 +57,30 @@ export default function ProjectTabs ({ userId, project }: ProjectTabsProps) {
   }
 
   const durationDays = getDuration(projectStartDate, projectEndDate);
-  const wordsPerDay = getWordsPerDay(wordcountGoal, durationDays);
+  const wordsLeftToWrite = getWordsLeftToWrite(wordcountGoal, totalWordsWritten);
+  const wordsPerDay = getWordsPerDay(wordsLeftToWrite, durationDays);
+  const initialWordsPerDay = getWordsPerDay(wordcountGoal, durationDays);
+  const daysRemaining = getDaysRemaining(projectEndDate);
+  const projectPercentageCompleted = getPercentageCompleted(wordcountGoal, totalWordsWritten);
+  const projectedDailyWordcounts = getProjectedDailyWordcounts(initialWordsPerDay, projectStartDate, projectEndDate);
+  const actualDailyWordcounts = getActualDailyWordcounts(wordCounts, projectStartDate, projectEndDate);
+
+  const allProjectData: AllProjectData = {
+    project,
+    wordcountGoal,
+    durationDays,
+    initialWordsPerDay,
+    wordsPerDay,
+    totalWordsWritten,
+    setTotalWordsWritten,
+    wordCounts,
+    setWordCounts,
+    wordsLeftToWrite,
+    daysRemaining,
+    projectPercentageCompleted,
+    projectedDailyWordcounts,
+    actualDailyWordcounts
+  }
 
   return (
     <Tabs defaultValue="overview">
@@ -65,10 +93,11 @@ export default function ProjectTabs ({ userId, project }: ProjectTabsProps) {
         {/* OVERVIEW */}
         <TabsContent value="overview" className="flex flex-col gap-5 pt-5 pl-2">
           <div className="w-full flex flex-col lg:flex-row gap-5">
-            <ProjectGoalsCard projectStartDate={projectStartDate} projectEndDate={projectEndDate} wordcountGoal={wordcountGoal} durationDays={durationDays} wordsPerDay={wordsPerDay} />
-            <ProjectProgressCard />
+            <ProjectGoalsCard allProjectData={allProjectData} />
+            <ProjectProgressCard allProjectData={allProjectData} />
           </div>
-          <DailyProgressCard project={project} userId={userId}/>
+          <DailyProgressCard allProjectData={allProjectData} userId={userId} />
+          <DailyProgressChartCard allProjectData={allProjectData} />
         </TabsContent>
 
         {/* ANALYTICS */}

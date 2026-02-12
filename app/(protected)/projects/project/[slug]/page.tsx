@@ -2,6 +2,7 @@ import ProjectTabs from "@/components/project-tabs";
 import { SiteHeader } from "@/components/site-header";
 import { getProject } from "@/lib/project.utils";
 import { getUser } from "@/lib/user.utils";
+import { getAllWords } from "@/lib/words.utils";
 import { redirect } from "next/navigation";
 
 export default async function ProjectPage(
@@ -15,6 +16,8 @@ export default async function ProjectPage(
   const project = await getProject(user.id, slug);
   if (!project) redirect('/dashboard');
 
+  const allWordcounts = await getAllWords(user.id, project.id);
+
   return (
     <div>
       <SiteHeader title={project.title}/>
@@ -23,7 +26,7 @@ export default async function ProjectPage(
           <h2 className="text-xl font-bold">{project.title}</h2>
           <p className="text-sm italic">{project.description}</p>
         </div>
-        <ProjectTabs userId={user.id} project={project} />
+        <ProjectTabs userId={user.id} project={project} allWordcounts={allWordcounts || []}/>
       </div>
     </div>
   )

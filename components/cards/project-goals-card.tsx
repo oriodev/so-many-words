@@ -8,23 +8,17 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { formatDate } from "@/lib/utils";
+import { AllProjectData } from "@/types";
 import { Pen, PartyPopper } from "lucide-react"
 
 interface ProjectGoalsCardProps {
-  projectStartDate: string;
-  projectEndDate: string;
-  wordcountGoal: number;
-  wordsPerDay: number;
-  durationDays: number;
+  allProjectData: AllProjectData
 }
 
-export default function ProjectGoalsCard({
-  projectStartDate,
-  projectEndDate,
-  wordcountGoal,
-  wordsPerDay,
-  durationDays
-}: ProjectGoalsCardProps ) {
+export default function ProjectGoalsCard({ allProjectData }: ProjectGoalsCardProps ) {
+  const { project, wordcountGoal, wordsPerDay, durationDays, daysRemaining } = allProjectData;
+  const { projectStartDate, projectEndDate } = project;
+
   return (
     <Card className="@container/card w-full flex flex-col justify-between">
       <CardHeader>
@@ -40,15 +34,9 @@ export default function ProjectGoalsCard({
             {wordsPerDay.toLocaleString()} word{wordsPerDay !== 1 ? 's' : ''} per day
           </div>
           <div className="text-muted-foreground">
-            Over {durationDays.toLocaleString()} day{durationDays !== 1 ? 's' : ''}
+            Over {durationDays.toLocaleString()} day{durationDays !== 1 ? 's' : ''} ( { daysRemaining } day{daysRemaining !== 1 ? 's' : ''} left )
           </div>
         </div>
-        <CardAction>
-          <Badge variant="outline" className="p-5">
-            <PartyPopper />
-            On Track
-          </Badge>
-        </CardAction>
       </CardFooter>
     </Card>
   )

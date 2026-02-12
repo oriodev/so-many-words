@@ -9,17 +9,17 @@ BEGIN
     IF TG_OP = 'INSERT' THEN
         -- Adding new words
         UPDATE projects
-        SET total_words_written = total_words_written + NEW.word_count
+        SET total_words_written = total_words_written + NEW.wordcount
         WHERE id = NEW.project_id;
     ELSIF TG_OP = 'UPDATE' THEN
         -- Updating existing words
         UPDATE projects
-        SET total_words_written = total_words_written - OLD.word_count + NEW.word_count
+        SET total_words_written = total_words_written - OLD.word_count + NEW.wordcount
         WHERE id = OLD.project_id;
     ELSIF TG_OP = 'DELETE' THEN
         -- Removing words
         UPDATE projects
-        SET total_words_written = total_words_written - OLD.word_count
+        SET total_words_written = total_words_written - OLD.wordcount
         WHERE id = OLD.project_id;
     END IF;
     RETURN NULL;

@@ -8,6 +8,7 @@ export type User = {
 }
 
 export type Project = {
+  id: string;
   title: string;
   description: string;
   slug: string;
@@ -15,6 +16,7 @@ export type Project = {
   projectStartDate: string;
   projectEndDate: string;
   createdAt: string;
+  totalWordsWritten: number;
 }
 
 export type ProjectSchema = {
@@ -26,12 +28,34 @@ export type ProjectSchema = {
 }
 
 export type Words = {
+  id: string;
   projectId: string;
   wordcount: number;
   date: string;
 }
 
 export type WordsSchema = {
+  projectId: string;
   wordcount: number;
   date: Date;
+}
+
+/**
+ * Makes it easier to pass data between components in project pages
+ */
+export type AllProjectData = {
+  project: Project;
+  wordcountGoal: number;
+  durationDays: number;
+  initialWordsPerDay: number;
+  wordsPerDay: number;
+  totalWordsWritten: number;
+  setTotalWordsWritten: React.Dispatch<React.SetStateAction<number>>;
+  wordCounts: Words[];
+  setWordCounts: React.Dispatch<React.SetStateAction<Words[]>>
+  wordsLeftToWrite: number;
+  daysRemaining: number;
+  projectPercentageCompleted: number;
+  projectedDailyWordcounts: { date: Date, wordcount: number }[]
+  actualDailyWordcounts: { date: Date, wordcount: number }[]
 }
