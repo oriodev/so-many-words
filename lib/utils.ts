@@ -1,8 +1,8 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
-import { differenceInDays, format, parseISO } from 'date-fns';
-import { Words } from "@/types";
+import { differenceInCalendarDays, differenceInDays, format, parseISO } from 'date-fns';
+import { AllProjectData, Project, ProjectedAndActualWordcounts, Words } from "@/types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -159,10 +159,85 @@ export function getCombineProjectedAndActualWordcountArrays(
     return {
       projectedWordcount,
       actualWordcount: item.wordcount,
-      date: item.date.toISOString().split('T')[0]
+      date: item.date
     };
   });
 
   return combinedArray;
 
+}
+
+/**
+ * From project and active states, return all project data and calculations
+ * @param project 
+ * @param wordCounts 
+ * @param setWordCounts 
+ * @param totalWordsWritten 
+ * @param setTotalWordsWritten 
+ * @returns so many things
+ */
+export function getAllProjectData(
+  project: Project,
+  wordCounts: Words[],
+  setWordCounts: React.Dispatch<React.SetStateAction<Words[]>>,
+  totalWordsWritten: number,
+  setTotalWordsWritten: React.Dispatch<React.SetStateAction<number>>
+): AllProjectData {
+
+  // EXTRACT FROM PROJECT
+  const { wordcountGoal, projectStartDate, projectEndDate } = project;
+  
+  // BASIC CALCULATIONS
+  const durationDays = getDuration(projectStartDate, projectEndDate);
+  const wordsLeftToWrite = getWordsLeftToWrite(wordcountGoal, totalWordsWritten);
+  const currentWordsPerDay = getWordsPerDay(wordsLeftToWrite, durationDays);
+  const initialWordsPerDay = getWordsPerDay(wordcountGoal, durationDays);
+  const daysRemaining = getDaysRemaining(projectEndDate);
+  const projectPercentageCompleted = getPercentageCompleted(wordcountGoal, totalWordsWritten);
+
+  // DAILY WORD COUNT PROJECTIONS AND ACTUAL DATA
+  const projectedDailyWordcounts = getProjectedDailyWordcounts(initialWordsPerDay, projectStartDate, projectEndDate);
+  const actualDailyWordcounts = getActualDailyWordcounts(wordCounts, projectStartDate, projectEndDate);
+  const projectedAndActualWordcounts = getCombineProjectedAndActualWordcountArrays(projectedDailyWordcounts, actualDailyWordcounts);
+
+  // SHOVE THEM IN AN OBJECT AND RETURN THEM
+  const allProjectData: AllProjectData = {
+    project,
+    durationDays,
+    initialWordsPerDay,
+    currentWordsPerDay,
+    totalWordsWritten,
+    setTotalWordsWritten,
+    wordCounts,
+    setWordCounts,
+    wordsLeftToWrite,
+    daysRemaining,
+    projectPercentageCompleted,
+    projectedAndActualWordcounts
+  }
+
+  return allProjectData;
+}
+
+/**
+ * Calculates an updated wordcount goal given words already written for a specific day
+ * @param projectEndDate 
+ * @param date 
+ * @param projectedAndActualWordcounts 
+ * @param wordcountGoal 
+ * @returns number
+ */
+export function getUpdatedWordcountGoalForGivenDay (
+  projectEndDate: string, date: Date, 
+  projectedAndActualWordcounts: ProjectedAndActualWordcounts,
+  wordcountGoal: number
+): number {
+  // GET DAYS LEFT
+  const remainingDays = differenceInCalendarDays(projectEndDate, date) + 1;
+  const currentDay = projectedAndActualWordcounts.length - remainingDays;
+  const wordsWritten = currentDay === 0 ? 0 : (projectedAndActualWordcounts[currentDay - 1].actualWordcount);
+  const wordsLeftToWriteOnDate = wordcountGoal - wordsWritten;
+  const wordcountGoalOnDate = Math.ceil(wordsLeftToWriteOnDate / remainingDays);
+  
+  return wordcountGoalOnDate;
 }

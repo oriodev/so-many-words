@@ -7,9 +7,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { formatDate } from "@/lib/utils";
+import { getProgressBadge } from "@/lib/badges.utils";
 import { AllProjectData } from "@/types";
-import { Pen, PartyPopper } from "lucide-react"
+import { differenceInCalendarDays } from "date-fns";
+
 
 interface ProjectProgressCardProps {
   allProjectData: AllProjectData
@@ -18,14 +19,27 @@ interface ProjectProgressCardProps {
 export default function ProjectProgressCard({
   allProjectData
 }: ProjectProgressCardProps ) {
-  const { totalWordsWritten, wordsLeftToWrite, projectPercentageCompleted } = allProjectData;
+  const { project, totalWordsWritten, wordsLeftToWrite, initialWordsPerDay, projectPercentageCompleted } = allProjectData;
+  const { wordcountGoal, projectStartDate } = project;
+
+  const wordsProgressTitle = totalWordsWritten > wordcountGoal ?
+    `${ Math.abs(wordsLeftToWrite).toLocaleString() } Words Over!` :
+    `${ wordsLeftToWrite.toLocaleString() } Words Left`;
+
+  const currentDay = differenceInCalendarDays(new Date(), projectStartDate) + 1;
+  const expectedWordcount = currentDay * initialWordsPerDay;
+
+  const progressBadge = getProgressBadge(totalWordsWritten, wordcountGoal, expectedWordcount);
+
+
+
 
   return (
     <Card className="@container/card w-full flex flex-col justify-between">
       <CardHeader>
         <CardDescription>{totalWordsWritten.toLocaleString()} words written so far!</CardDescription>
         <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-          { wordsLeftToWrite.toLocaleString() } words left
+          { wordsProgressTitle }
         </CardTitle>
       </CardHeader>
       <CardFooter className="flex flex-row justify-between gap-1.5 text-sm">
@@ -34,13 +48,16 @@ export default function ProjectProgressCard({
             {projectPercentageCompleted}% Completed
           </div>
           <div className="text-muted-foreground">
-            xxx days left
           </div>
         </div>
         <CardAction>
-          <Badge variant="outline" className="p-5">
-            <PartyPopper />
-            On Track
+          <Badge 
+            variant="outline" 
+            className="p-5" 
+            style={{ backgroundColor: progressBadge.colour }}
+          >
+            < progressBadge.icon />
+            { progressBadge.text }
           </Badge>
         </CardAction>
       </CardFooter>

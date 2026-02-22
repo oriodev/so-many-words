@@ -7,14 +7,22 @@ import {
 } from "@/components/ui/card";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Field, FieldGroup, FieldLabel } from "../ui/field";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Progress } from "../ui/progress";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 
 // NOT COMPONENTS
-import { formatDate, getPercentageCompleted } from "@/lib/utils";
+import { formatDate, getPercentageCompleted, getUpdatedWordcountGoalForGivenDay } from "@/lib/utils";
 import { AllProjectData, Words, WordsSchema } from "@/types";
-import { addDays, isAfter, isBefore, isSameDay } from "date-fns";
+import { addDays, differenceInCalendarDays, differenceInDays, isAfter, isBefore, isSameDay } from "date-fns";
 import { useEffect, useState } from "react";
 import z from "zod";
 import { Controller, useForm } from "react-hook-form";
@@ -33,10 +41,10 @@ export default function DailyProgressCard({
   allProjectData
 }: DailyProgressCardProps) {
   // GRAB WHAT WE NEED FROM PROJECT DATA
-  const { project, wordCounts, wordsPerDay, setWordCounts, setTotalWordsWritten } = allProjectData;
+  const { projectedAndActualWordcounts, project, wordCounts, initialWordsPerDay, currentWordsPerDay, setWordCounts, setTotalWordsWritten } = allProjectData;
+  const { projectStartDate, projectEndDate, id: projectId, wordcountGoal } = project;
   
   // HANDLE DATES
-  const { projectStartDate, projectEndDate, id: projectId } = project;
   const today = new Date();
   const [date, setDate] = useState<Date>(today);
 
@@ -64,8 +72,21 @@ export default function DailyProgressCard({
   // HANDLE WORDCOUNTS
   const matchedWordcount = wordCounts.find((word) => isSameDay(date, word.date));
   const initialWordCount = matchedWordcount ? matchedWordcount.wordcount : 0;
+  
+  // GET UPDATED WORD COUNT GOAL FOR GIVEN DAY
+  const updatedwordcountGoalForGivenDay = getUpdatedWordcountGoalForGivenDay(
+    projectEndDate,
+    date,
+    projectedAndActualWordcounts,
+    wordcountGoal
+  );
+  
+  // GET PERCENTAGE COMPLETED PER DAY
+  const percentageComplete = getPercentageCompleted(updatedwordcountGoalForGivenDay, matchedWordcount?.wordcount || 0);
+  const dailyWordgoalText = updatedwordcountGoalForGivenDay > 0
+    ? `Write ${ updatedwordcountGoalForGivenDay } words to stay on track`
+    : `You've already won! Write whatever you like <3`;
 
-  const percentageComplete = getPercentageCompleted(wordsPerDay, matchedWordcount?.wordcount || 0);
 
   // SET UP THE INPUT FORM
   const formSchema = z.object({
@@ -126,28 +147,49 @@ export default function DailyProgressCard({
 
   return (
     <Card className="@container/card w-full">
-      <CardHeader className="w-full flex justify-center items-center">
+      <CardHeader className="w-full flex flex-col gap-2 items-center">
 
-        {/* ARROWS AND DATE */}
-        <ChevronLeft
-          size={30}
-          className={`${canGoBackward ? 'hover:cursor-pointer hover:opacity-80 transition' : 'opacity-50 text-gray-400 cursor-default'}`}
-          onClick={canGoBackward ? onYesterday : undefined}
-        />
-        <CardTitle className="no-highlight text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-          {formatDate(date)}
-        </CardTitle>
-        <ChevronRight
-          size={30}
-          className={`${canGoForward ? "hover:cursor-pointer hover:opacity-80 transition" : 'opacity-50 text-gray-400 cursor-default'}`}
-          onClick={canGoForward ? onTomorrow : undefined}
-        />
+        <div className="w-full flex justify-center items-center">
+          {/* ARROWS AND DATE */}
+          <ChevronLeft
+            size={30}
+            className={`${canGoBackward ? 'hover:cursor-pointer hover:opacity-80 transition' : 'opacity-50 text-gray-400 cursor-default'}`}
+            onClick={canGoBackward ? onYesterday : undefined}
+          />
+          <CardTitle className="no-highlight text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+            {formatDate(date)}
+          </CardTitle>
+          <ChevronRight
+            size={30}
+            className={`${canGoForward ? "hover:cursor-pointer hover:opacity-80 transition" : 'opacity-50 text-gray-400 cursor-default'}`}
+            onClick={canGoForward ? onTomorrow : undefined}
+          />
+
+        </div>
+
+        <div>
+          <p>{ dailyWordgoalText }</p>
+        </div>
       </CardHeader>
 
       {/* WORDCOUNT INPUT */}
       <CardContent className="w-full flex flex-col gap-1 justify-center items-center pt-3">
         
+        {/* SELECT */}
         <FieldGroup className="w-1/3 flex flex-row justify-center gap-2">
+          <Select defaultValue="words_today">
+            <SelectTrigger aria-invalid className="rounded-lg bg-cyan-900">
+              <SelectValue  />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem value="words_today">Words Today</SelectItem>
+                <SelectItem value="total_words">Total Words</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+
+          {/* INPUT */}
           <Controller
             name="wordCount"
             control={control}
@@ -170,6 +212,8 @@ export default function DailyProgressCard({
               </div>
             )}
           />
+
+          {/* BUTTON */}
           <Button className="rounded-lg bg-cyan-900 hover:bg-cyan-700" onClick={handleSubmit(handleUpdate)}>
             Update
           </Button>

@@ -1,3 +1,5 @@
+import { LucideIcon } from "lucide-react";
+
 export type User = {
   id: string;
   email: string;
@@ -45,10 +47,9 @@ export type WordsSchema = {
  */
 export type AllProjectData = {
   project: Project;
-  wordcountGoal: number;
   durationDays: number;
   initialWordsPerDay: number;
-  wordsPerDay: number;
+  currentWordsPerDay: number;
   totalWordsWritten: number;
   setTotalWordsWritten: React.Dispatch<React.SetStateAction<number>>;
   wordCounts: Words[];
@@ -56,6 +57,13 @@ export type AllProjectData = {
   wordsLeftToWrite: number;
   daysRemaining: number;
   projectPercentageCompleted: number;
-  projectedDailyWordcounts: { date: Date, wordcount: number }[]
-  actualDailyWordcounts: { date: Date, wordcount: number }[]
+  projectedAndActualWordcounts: ProjectedAndActualWordcounts;
+}
+
+export type ProjectedAndActualWordcounts = { projectedWordcount: number, actualWordcount: number, date: Date }[];
+
+export type ProgressBadge = {
+  text: string;
+  icon: LucideIcon;
+  colour: string;
 }

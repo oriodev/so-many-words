@@ -17,19 +17,12 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { getCombineProjectedAndActualWordcountArrays } from "@/lib/utils";
+
 
 // NOT COMPONENTS
 import { AllProjectData } from "@/types";
-import { useState } from "react";
-import { Area, AreaChart, CartesianGrid, Line, LineChart, XAxis } from "recharts"
+import { format } from "date-fns";
+import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts"
 
 // PROPS
 interface DailyProgressChartCardProps {
@@ -41,10 +34,7 @@ export default function DailyProgressChartCard({
   allProjectData
 }: DailyProgressChartCardProps) {
   // GRAB WHAT WE NEED FROM PROJECT DATA
-  const { project, durationDays, projectedDailyWordcounts, actualDailyWordcounts } = allProjectData;
-  const { projectStartDate } = project;
-
-  const chartData = getCombineProjectedAndActualWordcountArrays(projectedDailyWordcounts, actualDailyWordcounts);
+  const { projectedAndActualWordcounts: chartData } = allProjectData;
 
   const chartConfig = {
     words: {
@@ -60,15 +50,19 @@ export default function DailyProgressChartCard({
     },
   } satisfies ChartConfig;
 
-  const [timeRange, setTimeRange] = useState(`${durationDays}d`);
-  
+const largestLabel = chartData.length > 0
+  ? (chartData[chartData.length - 1]['projectedWordcount'] > chartData[chartData.length - 1]['actualWordcount']
+      ? 'projectedWordcount'
+      : 'actualWordcount')
+  : 'projectedWordcount';
+
   return (
     <Card className="@container/card w-full">
       <CardHeader className="w-full flex justify-center items-center">
         <div className="grid flex-1 gap-1">
-          <CardTitle>Progress</CardTitle>
+          <CardTitle>Look how many words you've written!</CardTitle>
           <CardDescription>
-            Showing words vs projected words
+            That's crazy bro.
           </CardDescription>
         </div>
       </CardHeader>
@@ -89,13 +83,21 @@ export default function DailyProgressChartCard({
           >
             <CartesianGrid vertical={false} />
             <XAxis
-              dataKey="month"
-              tickLine={false}
-              axisLine={false}
+              dataKey="date"
+              tickLine={true}
+              axisLine={true}
               tickMargin={8}
-              tickFormatter={(value) => value.slice(0, 3)}
+              tickFormatter={(value) => format(value, 'dd/MM')}
+            />
+            <YAxis
+              dataKey={largestLabel}
+              tickLine={true}
+              axisLine={true}
+              tickMargin={8}
+              tickFormatter={(value) => parseInt(value).toLocaleString()}
             />
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+            <ChartLegend content={<ChartLegendContent />} />
             <Line
               dataKey="projectedWordcount"
               type="monotone"
