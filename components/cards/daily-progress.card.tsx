@@ -20,14 +20,15 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 
 // NOT COMPONENTS
-import { formatDate, getPercentageCompleted, getUpdatedWordcountGoalForGivenDay } from "@/lib/utils";
+import { formatDate, getPercentageCompleted, getPreviousDaysWordcount, getUpdatedWordcountGoalForGivenDay } from "@/lib/utils";
 import { AllProjectData, Words, WordsSchema } from "@/types";
-import { addDays, differenceInCalendarDays, differenceInDays, isAfter, isBefore, isSameDay } from "date-fns";
+import { addDays, isAfter, isBefore, isSameDay } from "date-fns";
 import { useEffect, useState } from "react";
 import z from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createWords, updateWord } from "@/lib/words.utils";
+import { WordcountProgressBar } from "../wordcount-progress-bar";
 
 // PROPS
 interface DailyProgressCardProps {
@@ -41,12 +42,19 @@ export default function DailyProgressCard({
   allProjectData
 }: DailyProgressCardProps) {
   // GRAB WHAT WE NEED FROM PROJECT DATA
-  const { projectedAndActualWordcounts, project, wordCounts, initialWordsPerDay, currentWordsPerDay, setWordCounts, setTotalWordsWritten } = allProjectData;
+  const { projectedAndActualWordcounts, project, wordCounts, setWordCounts, setTotalWordsWritten } = allProjectData;
   const { projectStartDate, projectEndDate, id: projectId, wordcountGoal } = project;
   
+  // SET UPDATE TYPE
+  const TypeEnum = z.enum(["words_today", "total_words"]);
+  const [updateType, setUpdateType] = useState<z.infer<typeof TypeEnum>>(TypeEnum.parse('words_today'));
+
+
   // HANDLE DATES
   const today = new Date();
-  const [date, setDate] = useState<Date>(today);
+  const defaultDay = today <= new Date(projectEndDate) ? today : new Date(projectEndDate);
+  const [date, setDate] = useState<Date>(defaultDay);
+  
 
   // HANDLES BACK AND FORTH BUTTONS
   const onTomorrow = () => {
@@ -71,8 +79,9 @@ export default function DailyProgressCard({
 
   // HANDLE WORDCOUNTS
   const matchedWordcount = wordCounts.find((word) => isSameDay(date, word.date));
-  const initialWordCount = matchedWordcount ? matchedWordcount.wordcount : 0;
-  
+  const initialDailyWordCount = matchedWordcount ? matchedWordcount.wordcount : 0;
+
+
   // GET UPDATED WORD COUNT GOAL FOR GIVEN DAY
   const updatedwordcountGoalForGivenDay = getUpdatedWordcountGoalForGivenDay(
     projectEndDate,
@@ -94,46 +103,68 @@ export default function DailyProgressCard({
       .number()
       .min(0, "Word count must be at least 0.")
       .int("Word count must be a whole number."),
+    type: TypeEnum
   });
 
-  const { control, handleSubmit, reset } = useForm({
+  const { control, handleSubmit, reset, watch } = useForm({
     resolver: zodResolver(formSchema),
-    defaultValues: { wordCount: initialWordCount },
+    defaultValues: { 
+      wordCount: initialDailyWordCount,
+      type: updateType
+    },
     mode: "onSubmit",
     shouldUnregister: false,
   });
 
-  // UPDATE THE DEFAULT VALUE IN INPUT WHEN WE SWITCH DAYS
+  // UPDATE THE DEFAULT VALUE IN INPUT WHEN WE SWITCH DAYS OR UPDATE TYPES
   useEffect(() => {
-    reset({ wordCount: matchedWordcount ? matchedWordcount.wordcount : 0 });
-  }, [date, matchedWordcount, reset]);
+    const initialTotalWordCount = getPreviousDaysWordcount(projectEndDate, date, projectedAndActualWordcounts);
+    
+    const initialWordCount = updateType === TypeEnum.parse('words_today') ?
+      initialDailyWordCount : initialTotalWordCount;
+
+    reset({ wordCount: initialWordCount, type: updateType });
+  }, [date, matchedWordcount, updateType]);
+
 
   // HANDLES UPDATING A WORDCOUNT (SUBMIT ON INPUT)
-  const handleUpdate = async (data: { wordCount: number }) => {
+  const handleUpdate = async (data: { wordCount: number, type: z.infer<typeof TypeEnum>;}) => {
+    const previousDaysTotalWordcount = getPreviousDaysWordcount(projectEndDate, date, projectedAndActualWordcounts);
 
     // IF THERE IS A WORDCOUNT ENTRY ALREADY
     if (matchedWordcount) {
       const previousWordCount = matchedWordcount.wordcount;
 
+      // IF GIVEN TOTAL WORDCOUNT, THEN FIND THE AMOUNT OF NEW WORDS
+      const newWordcount = data.type === 'total_words' 
+        ? data.wordCount - previousDaysTotalWordcount
+        : data.wordCount;
+
+
       // UPDATE IT IN DB
-      const response = await updateWord(matchedWordcount.id, data.wordCount);
+      const response = await updateWord(matchedWordcount.id, newWordcount);
       if (!response) return;
 
       // AND THEN UPDATE IT IN STATE
       setWordCounts((prevCounts) =>
         prevCounts.map((word) =>
-          word.id === matchedWordcount.id ? { ...word, wordcount: data.wordCount } : word
+          word.id === matchedWordcount.id ? { ...word, wordcount: newWordcount } : word
         )
       );
 
-      setTotalWordsWritten((prevTotal) => prevTotal - previousWordCount + data.wordCount);
+      setTotalWordsWritten((prevTotal) => prevTotal - previousWordCount + newWordcount);
     
       // IF THERE IS NO WORDCOUNT ENTRY IN DB
     } else {
+      // IF GIVEN TOTAL WORDCOUNT, THEN FIND THE AMOUNT OF NEW WORDS
+      const newWordcount = data.type === 'total_words' 
+        ? data.wordCount - previousDaysTotalWordcount
+        : data.wordCount;
+
       // UPDATE IN DB
       const newWords: WordsSchema = {
         projectId,
-        wordcount: data.wordCount,
+        wordcount: newWordcount,
         date
       }
       const response: Words | null = await createWords(newWords);
@@ -141,9 +172,11 @@ export default function DailyProgressCard({
 
       // UPDATE IN STATE
       setWordCounts((prevCounts) => [...prevCounts, { ...response }]);
-      setTotalWordsWritten((prevTotal) => prevTotal + data.wordCount); 
+      setTotalWordsWritten((prevTotal) => prevTotal + newWordcount); 
     }
   };
+
+  const formValues = watch();
 
   return (
     <Card className="@container/card w-full">
@@ -174,20 +207,45 @@ export default function DailyProgressCard({
 
       {/* WORDCOUNT INPUT */}
       <CardContent className="w-full flex flex-col gap-1 justify-center items-center pt-3">
+        <FieldGroup className="w-2/3 flex flex-row justify-center gap-2">
         
         {/* SELECT */}
-        <FieldGroup className="w-1/3 flex flex-row justify-center gap-2">
-          <Select defaultValue="words_today">
-            <SelectTrigger aria-invalid className="rounded-lg bg-cyan-900">
-              <SelectValue  />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectItem value="words_today">Words Today</SelectItem>
-                <SelectItem value="total_words">Total Words</SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+         <Controller
+            name="type"
+            control={control}
+            render={({ field, fieldState }) => (
+              <div className="flex flex-col gap-1">
+                <Select
+                  value={formValues.type} 
+                  defaultValue={field.value} 
+                  onValueChange={(value) => {
+                    field.onChange(value);
+                    setUpdateType(TypeEnum.parse(value));
+                  }}>
+                  <SelectTrigger
+                    aria-invalid={fieldState.invalid} 
+                    className="rounded-lg bg-cyan-900">
+                    <SelectValue  />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem
+                        value="words_today"
+                      >Words Today</SelectItem>
+                      <SelectItem 
+                        value="total_words"
+                      >Total Words</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+                {fieldState.invalid && (
+                  <span className="text-red-600">{fieldState.error?.message}</span>
+                )}
+              </div>
+            )}
+          />
+
+          
 
           {/* INPUT */}
           <Controller
@@ -220,12 +278,7 @@ export default function DailyProgressCard({
         </FieldGroup>
 
         {/* PROGRESS BAR */}
-        <Field className="w-2/3">
-          <FieldLabel htmlFor="progress-upload">
-            <span className="ml-auto">{percentageComplete}%</span>
-          </FieldLabel>
-          <Progress value={percentageComplete} id="progress-upload" className="h-[15px]" />
-        </Field>
+        <WordcountProgressBar percentageComplete={percentageComplete} />
       </CardContent>
     </Card>
   );

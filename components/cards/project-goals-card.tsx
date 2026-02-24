@@ -16,8 +16,9 @@ interface ProjectGoalsCardProps {
 }
 
 export default function ProjectGoalsCard({ allProjectData }: ProjectGoalsCardProps ) {
-  const { project, initialWordsPerDay, durationDays, daysRemaining } = allProjectData;
+  const { project, initialWordsPerDay, durationDays } = allProjectData;
   const { projectStartDate, projectEndDate, wordcountGoal } = project;
+
 
   return (
     <Card className="@container/card w-full flex flex-col justify-between">
@@ -34,7 +35,7 @@ export default function ProjectGoalsCard({ allProjectData }: ProjectGoalsCardPro
             {initialWordsPerDay.toLocaleString()} word{initialWordsPerDay !== 1 ? 's' : ''} per day
           </div>
           <div className="text-muted-foreground">
-            Over {durationDays.toLocaleString()} day{durationDays !== 1 ? 's' : ''} ( { daysRemaining } day{daysRemaining !== 1 ? 's' : ''} left )
+            Over {durationDays.toLocaleString()} day{durationDays !== 1 ? 's' : ''}
           </div>
         </div>
       </CardFooter>

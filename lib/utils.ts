@@ -241,3 +241,22 @@ export function getUpdatedWordcountGoalForGivenDay (
   
   return wordcountGoalOnDate;
 }
+
+/**
+ * Returns the total words written on the day before given date
+ * @param projectEndDate 
+ * @param date 
+ * @param projectedAndActualWordcounts 
+ * @returns number
+ */
+export function getPreviousDaysWordcount (
+  projectEndDate: string, date: Date, 
+  projectedAndActualWordcounts: ProjectedAndActualWordcounts,
+): number {
+  // GET DAYS LEFT
+  const remainingDays = differenceInCalendarDays(projectEndDate, date) + 1;
+  const currentDay = projectedAndActualWordcounts.length - remainingDays;
+  const wordsWritten = currentDay === 0 ? 0 : (projectedAndActualWordcounts[currentDay].actualWordcount);
+  
+  return wordsWritten;
+}

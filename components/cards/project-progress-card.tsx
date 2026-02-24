@@ -19,8 +19,10 @@ interface ProjectProgressCardProps {
 export default function ProjectProgressCard({
   allProjectData
 }: ProjectProgressCardProps ) {
-  const { project, totalWordsWritten, wordsLeftToWrite, initialWordsPerDay, projectPercentageCompleted } = allProjectData;
+  const { project, totalWordsWritten, wordsLeftToWrite, initialWordsPerDay, projectPercentageCompleted, daysRemaining } = allProjectData;
   const { wordcountGoal, projectStartDate } = project;
+
+  const daysRemainingText = `${ Math.abs(daysRemaining) } day${daysRemaining !== 1 ? 's' : ''} ${daysRemaining < 0 ? 'past the deadline' : 'left'}`
 
   const wordsProgressTitle = totalWordsWritten > wordcountGoal ?
     `${ Math.abs(wordsLeftToWrite).toLocaleString() } Words Over!` :
@@ -42,14 +44,19 @@ export default function ProjectProgressCard({
           { wordsProgressTitle }
         </CardTitle>
       </CardHeader>
+
       <CardFooter className="flex flex-row justify-between gap-1.5 text-sm">
         <div>
           <div className="line-clamp-1 flex gap-2 font-medium items-center">
             {projectPercentageCompleted}% Completed
           </div>
-          <div className="text-muted-foreground">
+
+        
+        <div className="text-muted-foreground">
+           { daysRemainingText }
           </div>
         </div>
+
         <CardAction>
           <Badge 
             variant="outline" 
@@ -61,6 +68,7 @@ export default function ProjectProgressCard({
           </Badge>
         </CardAction>
       </CardFooter>
+
     </Card>
   )
 }
