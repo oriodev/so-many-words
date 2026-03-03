@@ -1,5 +1,6 @@
 import { Words, WordsSchema } from "@/types";
-import { getUser } from "./user.utils";
+import { getUser } from "../app/api/user.api";
+import { format } from "date-fns";
 
 /**
  * Gets a days wordcount given a user id, project slug, and date
@@ -106,3 +107,28 @@ export const updateWord = async (wordsId: string, wordcount: number): Promise<Wo
   return tempRes;
 }
 
+/**
+ * 
+ * @param date 
+ * @param period must be 'month' 'year' or 'week'
+ * @returns 
+ */
+export const getTotalWordcountGivenDate = async (date: Date, period: string): Promise<number | null> => {
+  const user = await getUser();
+  if (!user) return null;
+
+  const formattedDate = format(date, 'yyyy-MM-dd');
+
+  const wordsUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/words/user/${user.id}/getWordTotals?date=${formattedDate}&period=${period}`;
+  const response = await fetch(wordsUrl);
+
+  if (!response.ok) {
+    const error = await response.json();
+    console.log('Get Total Words Error: ', error);
+    return null;
+  }
+
+  const totalWordcount = await response.json()
+
+  return totalWordcount;
+}

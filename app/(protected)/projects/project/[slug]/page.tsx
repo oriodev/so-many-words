@@ -1,7 +1,7 @@
 import ProjectTabs from "@/components/project-tabs";
 import { SiteHeader } from "@/components/site-header";
 import { getProject } from "@/lib/project.utils";
-import { getUser } from "@/lib/user.utils";
+import { getUser } from "@/app/api/user.api";
 import { getAllWords } from "@/lib/words.utils";
 import { redirect } from "next/navigation";
 

@@ -99,7 +99,6 @@ export function EditProjectForm({ project, userId, slug }: EditProjectFormProps)
       EditProjectInStore(project.title, editedProject.title);
       router.push(`/projects/project/${editedProject.slug}`);
     }
-
   }
 
   return (

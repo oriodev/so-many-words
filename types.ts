@@ -2,11 +2,15 @@ import { LucideIcon } from "lucide-react";
 
 export type User = {
   id: string;
+  createdAt: string;
   email: string;
   email_verified: boolean;
   phone_verified: boolean;
   sub: string;
   username: string;
+  yearlyWordGoal: number;
+  monthlyWordGoal: number;
+  weeklyWordGoal: number;
 }
 
 export type Project = {
@@ -19,6 +23,13 @@ export type Project = {
   projectEndDate: string;
   createdAt: string;
   totalWordsWritten: number;
+}
+
+export type ProfileSchema = {
+  id: string;
+  yearlyWordGoal: number;
+  monthlyWordGoal: number;
+  weeklyWordGoal: number;
 }
 
 export type ProjectSchema = {
@@ -58,6 +69,13 @@ export type AllProjectData = {
   daysRemaining: number;
   projectPercentageCompleted: number;
   projectedAndActualWordcounts: ProjectedAndActualWordcounts;
+}
+
+export type AllDashboardData = {
+  alltimeTotalWordcount: number;
+  yearTotalWordcount: number;
+  monthTotalWordcount: number;
+  weekTotalWordcount: number;
 }
 
 export type ProjectedAndActualWordcounts = { projectedWordcount: number, actualWordcount: number, date: Date }[];

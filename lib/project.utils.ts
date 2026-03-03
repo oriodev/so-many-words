@@ -1,7 +1,7 @@
 'use server'
 
 import { Project, ProjectSchema } from "@/types";
-import { getUser } from "./user.utils";
+import { getUser } from "../app/api/user.api";
 
 /**
  * Gets all projects given a user id. Returns [] on failure.
@@ -112,4 +112,18 @@ export const deleteProject = async (userId: string, slug: string): Promise<void 
   const returnResponse = await response.json();
   return returnResponse;
 
+}
+
+/**
+ * Gets total wordcount across all projects
+ * @param userId 
+ * @returns number
+ */
+export const getAllTimeTotalWordcount = async (userId: string): Promise<number | null> => {
+  const projectUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/projects/${userId}/totalWords`;
+  const fetchedWordcountTotal = await fetch(projectUrl);
+  if (!fetchedWordcountTotal) return null;
+
+  const wordcountTotal = (await fetchedWordcountTotal.json());
+  return wordcountTotal;
 }

@@ -1,7 +1,7 @@
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { getProjects } from "@/lib/project.utils";
-import { getUser } from "@/lib/user.utils";
+import { getUser } from "@/app/api/user.api";
 import { redirect } from "next/navigation";
 
 const ProtectedLayout = async ({

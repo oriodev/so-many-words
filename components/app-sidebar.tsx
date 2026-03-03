@@ -15,7 +15,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { LayoutDashboardIcon, ListIcon, ChartBarIcon, FolderIcon, UsersIcon, CameraIcon, FileTextIcon, Settings2Icon, CircleHelpIcon, SearchIcon, DatabaseIcon, FileChartColumnIcon, FileIcon, CommandIcon, SquareLibrary } from "lucide-react"
+import { LayoutDashboardIcon, ListIcon, ChartBarIcon, FolderIcon, UsersIcon, CameraIcon, FileTextIcon, Settings2Icon, CircleHelpIcon, SearchIcon, DatabaseIcon, FileChartColumnIcon, FileIcon, CommandIcon, SquareLibrary, Smile } from "lucide-react"
 import { Project, User } from "@/types"
 import { ModeToggle } from "./theme-toggle"
 import { useProjectsStore } from "@/lib/providers/projects-store-provider"
@@ -41,10 +41,17 @@ export function AppSidebar(
     navMain: [
       {
         title: "Dashboard",
-        url: "#",
+        url: "/dashboard",
         icon: (
           <LayoutDashboardIcon
           />
+        ),
+      },
+      {
+        title: "Profile",
+        url: "/profile",
+        icon: (
+          <Smile />
         ),
       },
     ],
