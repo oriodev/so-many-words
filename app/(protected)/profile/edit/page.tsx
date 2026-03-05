@@ -1,6 +1,6 @@
 import { EditProfileForm } from "@/components/forms/edit-profile-form";
 import { SiteHeader } from "@/components/site-header";
-import { getUser } from "@/app/api/user.api";
+import { getUser } from "@/api/user.api";
 import { redirect } from "next/navigation";
 
 export default async function Profile() {

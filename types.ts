@@ -11,6 +11,7 @@ export type User = {
   yearlyWordGoal: number;
   monthlyWordGoal: number;
   weeklyWordGoal: number;
+  dailyWordGoal: number;
 }
 
 export type Project = {
@@ -30,6 +31,7 @@ export type ProfileSchema = {
   yearlyWordGoal: number;
   monthlyWordGoal: number;
   weeklyWordGoal: number;
+  dailyWordGoal: number;
 }
 
 export type ProjectSchema = {
@@ -76,6 +78,11 @@ export type AllDashboardData = {
   yearTotalWordcount: number;
   monthTotalWordcount: number;
   weekTotalWordcount: number;
+  dayTotalWordcount: number;
+  lastYearTotalWordcount: number;
+  lastMonthTotalWordcount: number;
+  lastWeekTotalWordcount: number;
+  yesterdayTotalWordcount: number;
 }
 
 export type ProjectedAndActualWordcounts = { projectedWordcount: number, actualWordcount: number, date: Date }[];

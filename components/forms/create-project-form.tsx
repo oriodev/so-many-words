@@ -31,7 +31,7 @@ import {
 } from "@/components/ui/popover"
 
 
-import { createProject } from "@/lib/project.utils"
+import { createProject } from "@/api/project.api";
 import { useRouter } from "next/navigation"
 import { Project } from "@/types"
 import { useProjectsStore } from "@/lib/providers/projects-store-provider"

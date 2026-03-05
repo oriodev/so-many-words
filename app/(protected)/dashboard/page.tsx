@@ -4,11 +4,12 @@ import { DashboardWordTotalCards } from "@/components/section-cards"
 
 // import data from "./data.json"
 import { SiteHeader } from "@/components/site-header"
-import { getAllTimeTotalWordcount } from "@/lib/project.utils";
-import { getUser } from "@/app/api/user.api";
-import { getTotalWordcountGivenDate } from "@/lib/words.utils";
+import { getAllTimeTotalWordcount } from "@/api/project.api";
+import { getUser } from "@/api/user.api";
 import { AllDashboardData } from "@/types";
 import { redirect } from "next/navigation";
+import { getTotalWordcountGivenDate } from "@/api/words.api";
+import { startOfMonth, startOfWeek, startOfYear, subDays, subMonths, subWeeks, subYears } from "date-fns";
 
 export default async function Dashboard() {
   
@@ -21,12 +22,30 @@ export default async function Dashboard() {
   const yearTotalWordcount = await getTotalWordcountGivenDate(today, 'year') || 0;
   const monthTotalWordcount = await getTotalWordcountGivenDate(today, 'month') || 0;
   const weekTotalWordcount = await getTotalWordcountGivenDate(today, 'week') || 0;
+  const dayTotalWordcount = await getTotalWordcountGivenDate(today, 'day') || 0;
+
+  // Get comparison dates using date-fns
+  const lastYearStart = startOfYear(subYears(today, 1));
+  const lastMonthStart = startOfMonth(subMonths(today, 1));
+  const lastWeekStart = startOfWeek(subWeeks(today, 1));
+  const yesterdayStart = subDays(today, 1);
+
+  // Total word counts for comparison dates
+  const lastYearTotalWordcount = await getTotalWordcountGivenDate(lastYearStart, 'year') || 0;
+  const lastMonthTotalWordcount = await getTotalWordcountGivenDate(lastMonthStart, 'month') || 0;
+  const lastWeekTotalWordcount = await getTotalWordcountGivenDate(lastWeekStart, 'week') || 0;
+  const yesterdayTotalWordcount = await getTotalWordcountGivenDate(yesterdayStart, 'day') || 0;
 
   const dashboardData: AllDashboardData = {
     alltimeTotalWordcount,
     yearTotalWordcount,
     monthTotalWordcount,
-    weekTotalWordcount
+    weekTotalWordcount,
+    dayTotalWordcount,
+    lastYearTotalWordcount,
+    lastMonthTotalWordcount,
+    lastWeekTotalWordcount,
+    yesterdayTotalWordcount
   }
   
   return (

@@ -4,7 +4,7 @@ import { ProfileSchema } from "@/types";
 import { createClient } from "./supabase/server";
 
 export const updateProfile = async (updatedProfile: ProfileSchema) => {
-  const { id, yearlyWordGoal, monthlyWordGoal, weeklyWordGoal } = updatedProfile;
+  const { id, yearlyWordGoal, monthlyWordGoal, weeklyWordGoal, dailyWordGoal } = updatedProfile;
   const supabase = await createClient();
 
   const { data, error } = await supabase
@@ -13,7 +13,8 @@ export const updateProfile = async (updatedProfile: ProfileSchema) => {
       {
         yearly_word_goal: yearlyWordGoal,
         monthly_word_goal: monthlyWordGoal,
-        weekly_word_goal: weeklyWordGoal
+        weekly_word_goal: weeklyWordGoal,
+        daily_word_goal: dailyWordGoal
       }
     )
     .eq('id', id)

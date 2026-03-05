@@ -9,9 +9,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { getPercentChangesAndIcons, safeDivide } from "@/lib/utils"
 import { AllDashboardData, User } from "@/types"
 import { differenceInDays, startOfMonth, startOfWeek, startOfYear } from "date-fns"
-import { TrendingUpIcon, TrendingDownIcon } from "lucide-react"
+import React from "react"
 
 interface DashboardWordTotalCardsProps {
   dashboardData: AllDashboardData;
@@ -19,24 +20,19 @@ interface DashboardWordTotalCardsProps {
 }
 
 export function DashboardWordTotalCards({ dashboardData, user }: DashboardWordTotalCardsProps) {
-  const { alltimeTotalWordcount,
-    yearTotalWordcount,
-    monthTotalWordcount,
-    weekTotalWordcount } = dashboardData;
-  
-  const { createdAt, yearlyWordGoal, monthlyWordGoal, weeklyWordGoal } = user;
+  // IMPORT DATA
+  const { yearTotalWordcount, monthTotalWordcount, weekTotalWordcount, dayTotalWordcount,
+    lastYearTotalWordcount, lastMonthTotalWordcount, lastWeekTotalWordcount, yesterdayTotalWordcount
+   } = dashboardData;
+  const { yearlyWordGoal, monthlyWordGoal, weeklyWordGoal, dailyWordGoal } = user;
 
+  // GET DATES
   const today = new Date();
   const startOfThisYear = startOfYear(today);
   const startOfThisMonth = startOfMonth(today);
   const startOfThisWeek = startOfWeek(today);
 
-  // to get total wordcount
-  // i need to know when the user made their account
-  const daysActive = differenceInDays(today, createdAt);
-  const alltimeAverageWordsPerDay = Math.ceil(alltimeTotalWordcount / daysActive);
-
-  // needs to be up to this date
+  // GET WORDS PER DAY AVERAGES
   const daysThisYear = differenceInDays(today, startOfThisYear);
   const yearAverageWordsPerDay = Math.ceil(yearTotalWordcount / daysThisYear);
 
@@ -47,39 +43,22 @@ export function DashboardWordTotalCards({ dashboardData, user }: DashboardWordTo
   const weekAverageWordsPerDay = Math.ceil(weekTotalWordcount / daysThisWeek);
 
 
-  // need to calculate percentage of user's goals
-  // (currentWordCount / goal) * 100;
-  const percentOfYearlyGoal = Math.ceil((yearTotalWordcount / yearlyWordGoal) * 100);
-  const percentOfMonthlyGoal = Math.ceil((monthTotalWordcount / monthlyWordGoal) * 100);
-  const percentOfWeeklyGoal = Math.ceil((weekTotalWordcount / weeklyWordGoal) * 100);
+  // GET GOAL PROGRESS PERCENTAGES
+  const percentOfYearlyGoal = safeDivide(yearTotalWordcount, yearlyWordGoal);
+  const percentOfMonthlyGoal = safeDivide(monthTotalWordcount, monthlyWordGoal);
+  const percentOfWeeklyGoal = safeDivide(weekTotalWordcount, weeklyWordGoal);
+  const percentOfDailyGoal = safeDivide(dayTotalWordcount, dailyWordGoal);
+
+
+  // GET PERCENT CHANGES AND ICONS
+  const { percent: yearChangePercent, icon: YearChangeIcon } = getPercentChangesAndIcons(yearTotalWordcount, lastYearTotalWordcount);
+  const { percent: monthChangePercent, icon: MonthChangeIcon } = getPercentChangesAndIcons(monthTotalWordcount, lastMonthTotalWordcount);
+  const { percent: weekChangePercent, icon: WeekChangeIcon } = getPercentChangesAndIcons(weekTotalWordcount, lastWeekTotalWordcount);
+  const { percent: dayChangePercent, icon: DayChangeIcon } = getPercentChangesAndIcons(dayTotalWordcount, yesterdayTotalWordcount);
 
 
   return (
     <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
-      <Card className="@container/card">
-        <CardHeader>
-          <CardDescription>All Time Words</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            { alltimeTotalWordcount.toLocaleString() }
-          </CardTitle>
-          <CardAction>
-            <Badge variant="outline">
-              <TrendingUpIcon
-              />
-              +XX.X%
-            </Badge>
-          </CardAction>
-        </CardHeader>
-        <CardFooter className="flex-col items-start gap-1.5 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            { alltimeAverageWordsPerDay.toLocaleString() } Average Words Per Day
-          </div>
-          <div className="text-muted-foreground">
-            That's a lot of words.
-          </div>
-        </CardFooter>
-      </Card>
-
       <Card className="@container/card">
         <CardHeader>
           <CardDescription>Words This Year</CardDescription>
@@ -88,9 +67,8 @@ export function DashboardWordTotalCards({ dashboardData, user }: DashboardWordTo
           </CardTitle>
           <CardAction>
             <Badge variant="outline">
-              <TrendingDownIcon
-              />
-              -XX%
+              <YearChangeIcon />
+              {yearChangePercent}%
             </Badge>
           </CardAction>
         </CardHeader>
@@ -111,9 +89,8 @@ export function DashboardWordTotalCards({ dashboardData, user }: DashboardWordTo
           </CardTitle>
           <CardAction>
             <Badge variant="outline">
-              <TrendingUpIcon
-              />
-              +XX.X%
+              <MonthChangeIcon />
+              {monthChangePercent}%
             </Badge>
           </CardAction>
         </CardHeader>
@@ -134,9 +111,8 @@ export function DashboardWordTotalCards({ dashboardData, user }: DashboardWordTo
           </CardTitle>
           <CardAction>
             <Badge variant="outline">
-              <TrendingUpIcon
-              />
-              +X.X%
+              <WeekChangeIcon />
+              {weekChangePercent}%
             </Badge>
           </CardAction>
         </CardHeader>
@@ -146,6 +122,29 @@ export function DashboardWordTotalCards({ dashboardData, user }: DashboardWordTo
           </div>
           <div className="text-muted-foreground">
             { percentOfWeeklyGoal.toLocaleString() }% of {weeklyWordGoal.toLocaleString()} Word Goal
+          </div>
+        </CardFooter>
+      </Card>
+
+      <Card className="@container/card">
+        <CardHeader>
+          <CardDescription>Words Today</CardDescription>
+          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+            { dayTotalWordcount.toLocaleString() }
+          </CardTitle>
+          <CardAction>
+            <Badge variant="outline">
+              <DayChangeIcon />
+              {dayChangePercent}%
+            </Badge>
+          </CardAction>
+        </CardHeader>
+        <CardFooter className="flex-col items-start gap-1.5 text-sm">
+          <div className="line-clamp-1 flex gap-2 font-medium">
+            Your projects await you.
+          </div>
+          <div className="text-muted-foreground">
+            { percentOfDailyGoal.toLocaleString() }% of {dailyWordGoal.toLocaleString()} Word Goal
           </div>
         </CardFooter>
       </Card>

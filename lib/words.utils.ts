@@ -1,5 +1,5 @@
 import { Words, WordsSchema } from "@/types";
-import { getUser } from "../app/api/user.api";
+import { getUser } from "@/api/user.api";
 import { format } from "date-fns";
 
 /**

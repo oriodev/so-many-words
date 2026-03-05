@@ -1,3 +1,5 @@
+'use client'
+
 // COMPONENTS
 import {
   Card,
@@ -15,7 +17,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Progress } from "../ui/progress";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 
@@ -27,7 +28,7 @@ import { useEffect, useState } from "react";
 import z from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createWords, updateWord } from "@/lib/words.utils";
+import { createWords, updateWord } from "@/api/words.api";
 import { WordcountProgressBar } from "../wordcount-progress-bar";
 
 // PROPS

@@ -23,7 +23,10 @@ const formSchema = z.object({
     .min(1, "Monthly wordcount goal must be at least 1 word."),
   weeklyWordGoal: z
     .number()
-    .min(1, "Weekly wordcount goal must be at least 1 word.")
+    .min(1, "Weekly wordcount goal must be at least 1 word."),
+  dailyWordGoal: z
+    .number()
+    .min(1, "Daily wordcount goal must be at least 1 word.")
 });
 
 export function EditProfileForm({ user }: EditProfileFormProps) {
@@ -36,6 +39,7 @@ export function EditProfileForm({ user }: EditProfileFormProps) {
       yearlyWordGoal: user.yearlyWordGoal || 0,
       monthlyWordGoal: user.monthlyWordGoal || 0,
       weeklyWordGoal: user.weeklyWordGoal || 0,
+      dailyWordGoal: user.dailyWordGoal || 0,
     },
   });
   
@@ -43,16 +47,23 @@ export function EditProfileForm({ user }: EditProfileFormProps) {
   const yearlyWordGoal = watch("yearlyWordGoal");
   const monthlyWordGoal = watch("monthlyWordGoal");
   const weeklyWordGoal = watch("weeklyWordGoal");
+  const dailyWordGoal = watch("dailyWordGoal");
 
   const monthlyBasedOnYearly = Math.ceil(yearlyWordGoal / 12);
   const weeklyBasedOnYearly = Math.ceil(yearlyWordGoal / 52);
+  const dailyBasedOnYearly = Math.ceil(yearlyWordGoal / 365);
 
   const yearlyBasedOnMonthly = Math.ceil(monthlyWordGoal * 12);
   const weeklyBasedOnMonthly = Math.ceil(yearlyBasedOnMonthly / 52);
+  const dailyBasedOnMonthly = Math.ceil(yearlyBasedOnMonthly / 365);
 
   const yearlyBasedOnWeekly = Math.ceil(weeklyWordGoal * 52);
   const monthlyBasedOnWeekly = Math.ceil(yearlyBasedOnWeekly / 12);
+  const dailyBasedOnWeekly = Math.ceil(yearlyBasedOnWeekly / 365);
 
+  const yearlyBasedOnDaily = Math.ceil(dailyWordGoal * 365);
+  const monthlyBasedOnDaily = Math.ceil(yearlyBasedOnDaily / 12);
+  const weeklyBasedOnDaily = Math.ceil(yearlyBasedOnDaily / 52);
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
 
@@ -94,7 +105,7 @@ export function EditProfileForm({ user }: EditProfileFormProps) {
                     }}
                   />
                   <FieldDescription>
-                    { yearlyWordGoal.toLocaleString() || 0 } words a year is { monthlyBasedOnYearly.toLocaleString() } words a month and { weeklyBasedOnYearly.toLocaleString() } words a week.
+                    <b>{ monthlyBasedOnYearly.toLocaleString() }</b> words a month, <b>{ weeklyBasedOnYearly.toLocaleString() }</b> words a week, and <b>{ dailyBasedOnYearly.toLocaleString() }</b> words per day.
                   </FieldDescription>
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
@@ -126,7 +137,7 @@ export function EditProfileForm({ user }: EditProfileFormProps) {
                     }}
                   />
                   <FieldDescription>
-                    { monthlyWordGoal.toLocaleString() || 0 } words a month is { yearlyBasedOnMonthly.toLocaleString() } words a year and { weeklyBasedOnMonthly.toLocaleString() } words a week.
+                    <b>{ yearlyBasedOnMonthly.toLocaleString() }</b> words a year, <b>{ weeklyBasedOnMonthly.toLocaleString() }</b> words a week, and <b>{ dailyBasedOnMonthly.toLocaleString() }</b> words per day.
                   </FieldDescription>
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
@@ -158,7 +169,39 @@ export function EditProfileForm({ user }: EditProfileFormProps) {
                     }}
                   />
                   <FieldDescription>
-                    { weeklyWordGoal.toLocaleString() || 0 } words a week is { yearlyBasedOnWeekly.toLocaleString() } words a year and { monthlyBasedOnWeekly.toLocaleString() } words a month.
+                    <b>{ yearlyBasedOnWeekly.toLocaleString() }</b> words a year, <b>{ monthlyBasedOnWeekly.toLocaleString() }</b> words a month, and <b>{ dailyBasedOnWeekly.toLocaleString() }</b> words per day.
+                  </FieldDescription>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}}
+            />
+
+          {/* DAILY WORD GOAL */}
+          <Controller
+              name="dailyWordGoal"
+              control={form.control}
+              render={({ field, fieldState }) => {
+                return (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="form-rhf-demo-title">
+                    Daily Word Goal
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    type="number"
+                    id="form-rhf-demo-title"
+                    aria-invalid={fieldState.invalid}
+                    autoComplete="off"
+                    required
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      field.onChange(value === "" ? "" : Number(value));
+                    }}
+                  />
+                  <FieldDescription>
+                    <b>{ yearlyBasedOnDaily.toLocaleString() }</b> words a year, <b>{ monthlyBasedOnDaily.toLocaleString() }</b> words a month, and <b>{ weeklyBasedOnDaily.toLocaleString() }</b> words per week.
                   </FieldDescription>
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />

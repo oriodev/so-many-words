@@ -1,9 +1,9 @@
 import ProjectTabs from "@/components/project-tabs";
 import { SiteHeader } from "@/components/site-header";
-import { getProject } from "@/lib/project.utils";
-import { getUser } from "@/app/api/user.api";
-import { getAllWords } from "@/lib/words.utils";
+import { getProject } from "@/api/project.api";
+import { getUser } from "@/api/user.api";
 import { redirect } from "next/navigation";
+import { getAllWords } from "@/api/words.api";
 
 export default async function ProjectPage(
   { params }: { params: Promise<{ slug: string }> }

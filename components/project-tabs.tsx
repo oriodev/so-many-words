@@ -29,7 +29,7 @@ import DailyProgressChartCard from "./cards/daily-progress-chart-card";
 import { useState } from "react";
 import { redirect } from "next/navigation";
 
-import { deleteProject } from "@/lib/project.utils";
+import { deleteProject } from "@/api/project.api";
 import { useProjectsStore } from "@/lib/providers/projects-store-provider";
 import { getAllProjectData } from "@/lib/utils";
 

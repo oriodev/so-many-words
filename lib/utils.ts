@@ -4,6 +4,11 @@ import { twMerge } from "tailwind-merge"
 import { differenceInCalendarDays, differenceInDays, format, parseISO } from 'date-fns';
 import { AllProjectData, Project, ProjectedAndActualWordcounts, Words } from "@/types";
 
+import { TrendingUpIcon, TrendingDownIcon } from "lucide-react"
+import { LucideIcon } from "lucide-react";
+import { JSX, ReactNode } from "react";
+
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
@@ -260,3 +265,38 @@ export function getPreviousDaysWordcount (
   
   return wordsWritten;
 }
+
+/**
+ * Calculates percentage change. Returns 0 if NaN, infinity, etc.
+ * @param current 
+ * @param previous 
+ * @returns number
+ */
+export const calculatePercentageChange = (current: number, previous: number) => {
+  if (previous === 0) return current > 0 ? 100 : 0;
+  return ((current - previous) / previous) * 100;
+};
+
+/**
+ * Returns percentage change and relevant icon for showing wordcount goal achivement over time
+ * @param currentWordcount 
+ * @param previousWordcount 
+ * @returns { number, icon }
+ */
+export const getPercentChangesAndIcons = (currentWordcount: number, previousWordcount: number): { percent: number, icon: LucideIcon } => {
+  const percent = Math.ceil(calculatePercentageChange(currentWordcount, previousWordcount));
+  const icon = percent > 0 ? TrendingUpIcon : TrendingDownIcon;
+
+  return { percent, icon }
+}
+
+/**
+ * Division that returns 0 instead of NaN or infinity.
+ * @param totalWordCount 
+ * @param goal 
+ * @returns 
+ */
+export const safeDivide = (totalWordCount: number, goal: number): number => {
+    if (typeof goal !== 'number' || goal === 0) return 0;
+    return Math.ceil((totalWordCount / goal) * 100);
+};

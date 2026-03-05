@@ -30,7 +30,7 @@ import {
 import { useRouter } from "next/navigation"
 import { Project } from "@/types"
 import { useProjectsStore } from "@/lib/providers/projects-store-provider"
-import { editProject } from "@/lib/project.utils"
+import { editProject } from "@/api/project.api";
 import { format, parseISO } from "date-fns"
 import { CalendarIcon } from "lucide-react"
 import { Calendar } from "../ui/calendar"

@@ -1,7 +1,7 @@
 import { EditProjectForm } from "@/components/forms/edit-project-form";
 import { SiteHeader } from "@/components/site-header";
-import { getProject } from "@/lib/project.utils";
-import { getUser } from "@/app/api/user.api";
+import { getProject } from "@/api/project.api";
+import { getUser } from "@/api/user.api";
 import { redirect } from "next/navigation";
 
 export default async function EditPage (
