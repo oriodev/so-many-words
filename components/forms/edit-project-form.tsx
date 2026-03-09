@@ -7,6 +7,7 @@ import * as z from "zod"
 import { Button } from "@/components/ui/button"
 import {
   Field,
+  FieldContent,
   FieldDescription,
   FieldError,
   FieldGroup,
@@ -34,6 +35,7 @@ import { editProject } from "@/api/project.api";
 import { format, parseISO } from "date-fns"
 import { CalendarIcon } from "lucide-react"
 import { Calendar } from "../ui/calendar"
+import { Checkbox } from "../ui/checkbox"
 
 const formSchema = z.object({
   title: z
@@ -55,7 +57,8 @@ const formSchema = z.object({
         .date()
         .refine((endDate) => !isNaN(endDate.getTime()), {
           message: "End date must be valid.",
-        })
+        }),
+      active: z.boolean()  
     }).refine((data) => data.projectEndDate > data.projectStartDate, {
       message: "End date must be after the start date.",
       path: ["projectEndDate"],
@@ -75,7 +78,8 @@ export function EditProjectForm({ project, userId, slug }: EditProjectFormProps)
       description: project.description,
       wordcountGoal: project.wordcountGoal,
       projectStartDate: parseISO(project.projectStartDate),
-      projectEndDate: parseISO(project.projectEndDate)
+      projectEndDate: parseISO(project.projectEndDate),
+      active: project.active
     },
   })
 
@@ -297,6 +301,31 @@ export function EditProjectForm({ project, userId, slug }: EditProjectFormProps)
           <FieldDescription>
             That gives you {durationDays} day{durationDays !== 1 ? 's' : ''} at {wordsPerDay.toLocaleString()} words per day{wordsPerDay !== 1 ? 's' : ''}!
           </FieldDescription>
+
+          {/* ACTIVE CHECKBOX */}
+            <Controller
+              name="active"
+              control={form.control}
+              render={({ field }) => (
+                <Field orientation='horizontal'>
+                  <Checkbox 
+                    id="form-rhf-demo-active-checkbox"
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                  <FieldContent>
+                    <FieldLabel htmlFor="form-rhf-demo-active-checkbox">
+                      Active Project?
+                    </FieldLabel>
+                    <FieldDescription>
+                      Check to mark project as active.
+                    </FieldDescription>
+                  </FieldContent>
+                </Field>
+              )}
+            />
+
+
           </FieldGroup>
         </form>
 

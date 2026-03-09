@@ -22,7 +22,18 @@ export const getProjects = async (userId: string): Promise<Project[]> => {
     return [] as Project[];
   }
 
-  const projects: Project[] = fetchedProjects;
+  const projects: Project[] = fetchedProjects.map(project => ({
+    id: project.id,
+    title: project.title,
+    description: project.description,
+    slug: project.slug,
+    wordcountGoal: project.wordcount_goal,
+    projectStartDate: project.project_start_date,
+    projectEndDate: project.project_end_date,
+    createdAt: project.created_at,
+    totalWordsWritten: project.total_words_written,
+    active: project.active
+  }))
   return projects;
 }
 
@@ -56,7 +67,8 @@ export const getProject = async (userId: string, slug: string): Promise<Project 
     projectStartDate: fetchedProject.project_start_date,
     projectEndDate: fetchedProject.project_end_date,
     createdAt: fetchedProject.created_at,
-    totalWordsWritten: fetchedProject.total_words_written
+    totalWordsWritten: fetchedProject.total_words_written,
+    active: fetchedProject.active
   };
 }
 
@@ -101,7 +113,7 @@ export const createProject = async (data: ProjectSchema): Promise<void | null> =
 }
 
 export const editProject = async (userId: string, slug: string, project: ProjectSchema): Promise<void | null> => {
-  const { title, description, wordcountGoal, projectStartDate, projectEndDate } = project;
+  const { title, description, wordcountGoal, projectStartDate, projectEndDate, active } = project;
 
   const supabase = await createClient();
 
@@ -112,7 +124,8 @@ export const editProject = async (userId: string, slug: string, project: Project
         description,
         wordcount_goal: wordcountGoal, 
         project_start_date: projectStartDate, 
-        project_end_date: projectEndDate, 
+        project_end_date: projectEndDate,
+        active: active
       })
     .eq('user_id', userId)
     .eq('slug', slug)

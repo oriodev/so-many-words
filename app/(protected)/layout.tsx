@@ -13,6 +13,7 @@ const ProtectedLayout = async ({
     if (!user) redirect('/login');
     
     const projects = await getProjects(user.id);
+    const activeProjects = projects.filter(project => project.active);
 
     return (
         <div>
@@ -24,7 +25,7 @@ const ProtectedLayout = async ({
               } as React.CSSProperties
             }
           >
-            <AppSidebar variant="inset" user={user} projects={projects}/>
+            <AppSidebar variant="inset" user={user} projects={activeProjects}/>
               <SidebarInset>
                 {children}
               </SidebarInset>

@@ -18,20 +18,24 @@ import {
 } from "@/components/ui/sidebar"
 import { Project } from "@/types"
 import { MoreHorizontalIcon, FolderIcon, ShareIcon, Trash2Icon, Book } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 export function NavDocuments({
   projects,
 }: {
   projects: Project[]
 }) {
+  const router = useRouter();
   const { isMobile } = useSidebar()
   const numOfProjects = projects.length;
+
+  const cappedProjects = projects.slice(0, 10);
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel>Projects ({numOfProjects})</SidebarGroupLabel>
       <SidebarMenu>
-        {projects.map((project) => (
+        {cappedProjects.map((project) => (
           <SidebarMenuItem key={project.title}>
             <SidebarMenuButton asChild tooltip={project.title}>
               <a href={`/projects/project/${project.slug}`}>
@@ -75,12 +79,19 @@ export function NavDocuments({
             </DropdownMenu>
           </SidebarMenuItem>
         ))}
-        <SidebarMenuItem>
-          <SidebarMenuButton className="text-sidebar-foreground/70">
-            <MoreHorizontalIcon className="text-sidebar-foreground/70" />
-            <span>More</span>
-          </SidebarMenuButton>
-        </SidebarMenuItem>
+        {
+          numOfProjects > 10 && (
+            <SidebarMenuItem
+              onClick={() => router.push('/profile')}
+              className="hover:cursor-pointer"
+            >
+              <SidebarMenuButton className="text-sidebar-foreground/70">
+                <MoreHorizontalIcon className="text-sidebar-foreground/70" />
+                <span>More</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          )
+        }
       </SidebarMenu>
     </SidebarGroup>
   )

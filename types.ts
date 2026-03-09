@@ -24,6 +24,7 @@ export type Project = {
   projectEndDate: string;
   createdAt: string;
   totalWordsWritten: number;
+  active: boolean;
 }
 
 export type ProfileSchema = {
@@ -40,6 +41,7 @@ export type ProjectSchema = {
   wordcountGoal: number;
   projectStartDate: Date;
   projectEndDate: Date;
+  active: boolean;
 }
 
 export type Words = {
