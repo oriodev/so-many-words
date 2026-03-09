@@ -93,7 +93,12 @@ export function CreateProjectForm() {
   
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
-    const project = await createProject(data) as Project | null;
+    const payload = {
+      active: true,
+      ...data
+    };
+    
+    const project = await createProject(payload) as Project | null;
     if (project) {
       addProject(project);
       router.push(`/projects/project/${project.slug}`);
