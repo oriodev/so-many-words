@@ -1,45 +1,23 @@
-### Cool SQL Stuff
+# So Many Words
 
+<img width="1918" height="924" alt="image" src="https://github.com/user-attachments/assets/14ba8b43-4075-49f7-9677-b5bcf527d3f9" />
 
-```
--- updates the total_words_written property on projects when wordcount is updated
-CREATE OR REPLACE FUNCTION update_total_words_written()
-RETURNS TRIGGER AS $$
-BEGIN
-    IF TG_OP = 'INSERT' THEN
-        -- Adding new words
-        UPDATE projects
-        SET total_words_written = total_words_written + NEW.wordcount
-        WHERE id = NEW.project_id;
-    ELSIF TG_OP = 'UPDATE' THEN
-        -- Updating existing words
-        UPDATE projects
-        SET total_words_written = total_words_written - OLD.word_count + NEW.wordcount
-        WHERE id = OLD.project_id;
-    ELSIF TG_OP = 'DELETE' THEN
-        -- Removing words
-        UPDATE projects
-        SET total_words_written = total_words_written - OLD.wordcount
-        WHERE id = OLD.project_id;
-    END IF;
-    RETURN NULL;
-END;
-$$ LANGUAGE plpgsql;
+A word tracking app for writers to keep track of their wordcount goals and deadlines.
 
-```
+Built with Next.js/React, Tailwind, Shadcn, Zustand, and Supabase/PostgreSQL.
 
+---
 
-```
--- triggers the update_total_words_written function on insert/update/delete
-CREATE TRIGGER words_insert_trigger
-AFTER INSERT ON words
-FOR EACH ROW EXECUTE FUNCTION update_total_words_written();
+### Features
+- Accounts and authentication.
+- Set yourself yearly, monthly, weekly, and daily writing goals as you wish.
+- Track your writing progress across all projects with graphs visualising your wordcounts.
+- See your progress compared with the previous year, month, week, or day.
+- Create writing projects with deadlines and goals.
+- Set projects as inactive once you finish them or take a break.
+- Visualise your progress per project compared with where you need to be to reach your goal.
+- Update daily wordcounts either by that day's wordcount or your total wordcount for the project.
 
-CREATE TRIGGER words_update_trigger
-AFTER UPDATE ON words
-FOR EACH ROW EXECUTE FUNCTION update_total_words_written();
+<img width="1918" height="924" alt="image" src="https://github.com/user-attachments/assets/c903cb8f-0fb3-4b8c-851f-d80f58f10550" />
 
-CREATE TRIGGER words_delete_trigger
-AFTER DELETE ON words
-FOR EACH ROW EXECUTE FUNCTION update_total_words_written();
-```
+<img width="1918" height="924" alt="image" src="https://github.com/user-attachments/assets/5ac2810a-bfe0-46bf-9e49-aff70be1242c" />
