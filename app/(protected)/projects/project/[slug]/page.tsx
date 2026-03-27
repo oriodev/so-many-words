@@ -3,7 +3,7 @@ import { SiteHeader } from "@/components/site-header";
 import { getProject } from "@/api/project.api";
 import { getUser } from "@/api/user.api";
 import { redirect } from "next/navigation";
-import { getAllWords } from "@/api/words.api";
+import { getAllWordsGivenProject } from "@/api/words.api";
 
 export default async function ProjectPage(
   { params }: { params: Promise<{ slug: string }> }
@@ -16,7 +16,7 @@ export default async function ProjectPage(
   const project = await getProject(user.id, slug);
   if (!project) redirect('/dashboard');
 
-  const allWordcounts = await getAllWords(user.id, project.id);
+  const allWordcounts = await getAllWordsGivenProject(user.id, project.id);
 
   return (
     <div>

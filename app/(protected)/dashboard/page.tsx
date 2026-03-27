@@ -8,8 +8,10 @@ import { getAllTimeTotalWordcount } from "@/api/project.api";
 import { getUser } from "@/api/user.api";
 import { AllDashboardData } from "@/types";
 import { redirect } from "next/navigation";
-import { getTotalWordcountGivenDate } from "@/api/words.api";
+import { getAllWordsGivenTime, getTotalWordcountGivenDate } from "@/api/words.api";
 import { startOfMonth, startOfWeek, startOfYear, subDays, subMonths, subWeeks, subYears } from "date-fns";
+import { get356DayWordcounts } from "@/lib/utils";
+import { DashboardChart } from "@/components/dashboard-chart";
 
 export default async function Dashboard() {
   
@@ -17,6 +19,8 @@ export default async function Dashboard() {
   if (!user) redirect('/login');
 
   const today = new Date();
+
+  const yearDaysWordcounts = await getAllWordsGivenTime(user.id, '365d');
 
   const alltimeTotalWordcount = await getAllTimeTotalWordcount(user.id) || 0;
   const yearTotalWordcount = await getTotalWordcountGivenDate(today, 'year') || 0;
@@ -35,6 +39,8 @@ export default async function Dashboard() {
   const lastMonthTotalWordcount = await getTotalWordcountGivenDate(lastMonthStart, 'month') || 0;
   const lastWeekTotalWordcount = await getTotalWordcountGivenDate(lastWeekStart, 'week') || 0;
   const yesterdayTotalWordcount = await getTotalWordcountGivenDate(yesterdayStart, 'day') || 0;
+
+  const yearDaysWordcountsFullAray = yearDaysWordcounts ? get356DayWordcounts(yearDaysWordcounts) : [];
 
   const dashboardData: AllDashboardData = {
     alltimeTotalWordcount,
@@ -56,7 +62,8 @@ export default async function Dashboard() {
           <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
             <DashboardWordTotalCards dashboardData={dashboardData} user={user}/>
             <div className="px-4 lg:px-6">
-              <ChartAreaInteractive />
+              <ChartAreaInteractive data={yearDaysWordcountsFullAray}/>
+              {/* <DashboardChart data={yearDaysWordcountsFullAray} */}
             </div>
             {/* <DataTable data={data} /> */}
           </div>

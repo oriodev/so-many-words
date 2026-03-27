@@ -1,7 +1,7 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
-import { differenceInCalendarDays, differenceInDays, format, parseISO } from 'date-fns';
+import { addDays, differenceInCalendarDays, differenceInDays, format, parseISO, subDays } from 'date-fns';
 import { AllProjectData, Project, ProjectedAndActualWordcounts, Words } from "@/types";
 
 import { TrendingUpIcon, TrendingDownIcon } from "lucide-react"
@@ -144,6 +144,28 @@ export function getActualDailyWordcounts(wordCounts: Words[], startDate: string,
   });
 
   return actualDailyWordcounts;
+}
+
+export function get356DayWordcounts(wordcounts: Words[]): { date: Date, wordcount: number }[] {
+  const date = new Date();
+  const startDate = subDays(date, 365);
+
+  const dateToWordsMap = new Map(wordcounts.map(
+    (words) => [new Date(words.date).toISOString().split('T')[0], words.wordcount]
+  ));
+
+  const returnWordcounts = Array.from({ length: 365 }, (_, index) => {
+    const currentDate = addDays(startDate, index);
+    const formattedDate = currentDate.toISOString().split('T')[0];
+
+    return {
+      date: currentDate,
+      wordcount: dateToWordsMap.get(formattedDate) || 0
+    }
+  })
+
+  return returnWordcounts;
+  
 }
 
 /**

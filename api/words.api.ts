@@ -2,7 +2,7 @@
 
 import { Words, WordsSchema } from "@/types";
 import { getUser } from "./user.api";
-import { endOfWeek, format, parseISO, startOfWeek } from "date-fns";
+import { endOfWeek, format, parseISO, startOfWeek, subDays, subMonths, subYears } from "date-fns";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -37,13 +37,55 @@ export const getWords = async (userId: string, projectId: string, date: string):
   } as Words;
 }
 
+export const getAllWordsGivenTime = async ( userId: string, timeframe: '7d' | '30d' | '365d' ): Promise<Words[] | null> => {
+  const supabase = await createClient();
+  const now = new Date();
+  let cutoffDate: Date;
+
+  switch (timeframe) {
+    case '7d':
+      cutoffDate = subDays(now, 7);
+      break;
+    case '30d':
+      cutoffDate = subMonths(now, 1);
+      break;
+    case '365d':
+      cutoffDate = subYears(now, 1);
+      break;
+    default:
+      return null;
+  }
+
+   const cutoffDateISO = cutoffDate.toISOString();
+
+  const { data: fetchedWords, error } = await supabase
+    .from("words")
+    .select('*')
+    .eq('user_id', userId)
+    .gt('date', cutoffDateISO);
+
+  if (error) {
+    console.log('Error: ', error);
+    return null;
+  }
+
+  const words = fetchedWords.map((word) => ({
+    id: word.id,
+    projectId: word.project_id,
+    wordcount: word.wordcount,
+    date: word.date
+  }))
+
+  return words as Words[];
+}
+
 /**
  * Gets all wordcounts for a probject given a user id and projectId
  * @param userId string
  * @param projectId string
  * @returns Words
  */
-export const getAllWords = async (userId: string, projectId: string): Promise<Words[] | null> => {
+export const getAllWordsGivenProject = async (userId: string, projectId: string): Promise<Words[] | null> => {
   const supabase = await createClient();
 
   const { data: fetchedWords, error } = await supabase

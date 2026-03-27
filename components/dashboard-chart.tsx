@@ -1,9 +1,8 @@
 "use client"
 
-import * as React from "react"
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts"
+import { TrendingUp } from "lucide-react"
+import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
 
-import { useIsMobile } from "@/hooks/use-mobile"
 import {
   Card,
   CardAction,
@@ -12,12 +11,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-  type ChartConfig,
-} from "@/components/ui/chart"
 import {
   Select,
   SelectContent,
@@ -29,22 +22,32 @@ import {
   ToggleGroup,
   ToggleGroupItem,
 } from "@/components/ui/toggle-group"
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  type ChartConfig,
+} from "@/components/ui/chart"
+import { useIsMobile } from "@/hooks/use-mobile"
+import { useEffect, useState } from "react"
+import { formatDate } from "date-fns"
 
 const chartConfig = {
-  date: {
-    label: "Date",
-  },
   wordcount: {
     label: "Wordcount",
-    color: "var(--primary)"
-  }
+    color: "var(--primary)",
+  },
 } satisfies ChartConfig
 
-export function ChartAreaInteractive({ data }: { data: {date: Date, wordcount: number}[] }) {
-  const isMobile = useIsMobile()
-  const [timeRange, setTimeRange] = React.useState("30d")
+interface DashboardChartProps {
+  data: {date: Date, wordcount: number}[]
+}
 
-  React.useEffect(() => {
+export function DashboardChart({ data }: DashboardChartProps) {
+  const isMobile = useIsMobile()
+  const [timeRange, setTimeRange] = useState("30d")
+
+  useEffect(() => {
     if (isMobile) {
       setTimeRange("7d")
     }
@@ -68,16 +71,13 @@ export function ChartAreaInteractive({ data }: { data: {date: Date, wordcount: n
     startDate.setDate(startDate.getDate() - daysToSubtract)
     return date >= startDate
   })
-
+    
   return (
-    <Card className="@container/card">
+    <Card>
       <CardHeader>
         <CardTitle>Wordcount History</CardTitle>
         <CardDescription>
-          <span className="hidden @[540px]/card:block">
-            Words written across all projects
-          </span>
-          {/* <span className="@[540px]/card:hidden">Last 3 months</span> */}
+          Words written across all projects
         </CardDescription>
         <CardAction>
           <ToggleGroup
@@ -121,65 +121,33 @@ export function ChartAreaInteractive({ data }: { data: {date: Date, wordcount: n
           </Select>
         </CardAction>
       </CardHeader>
-      <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
-        <ChartContainer
-          config={chartConfig}
-          className="aspect-auto h-[250px] w-full"
-        >
-          <AreaChart data={filteredData} margin={{ top: 12, right: 0, left: 0, bottom: 0 }}>
-            <defs>
-              <linearGradient id="fillWordcount" x1="0" y1="0" x2="0" y2="1">
-                <stop
-                  offset="5%"
-                  stopColor="var(--color-wordcount)"
-                  stopOpacity={1.0}
-                />
-                <stop
-                  offset="95%"
-                  stopColor="var(--color-wordcount)"
-                  stopOpacity={0.1}
-                />
-              </linearGradient>
-            </defs>
+      <CardContent>
+        <ChartContainer config={chartConfig}>
+          <AreaChart
+            accessibilityLayer
+            data={filteredData}
+            margin={{
+              left: 12,
+              right: 12,
+            }}
+          >
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey="date"
               tickLine={false}
               axisLine={false}
               tickMargin={8}
-              minTickGap={32}
-              tickFormatter={(value) => {
-                const date = new Date(value)
-                return date.toLocaleDateString("en-UK", {
-                  month: "short",
-                  day: "numeric",
-                })
-              }}
-            />
-            <YAxis
-              dataKey="wordcount"
-              domain={[0, "dataMax"]}
-              tickLine={true}
+              tickFormatter={(value) => formatDate(value, 'dd MMM')}
             />
             <ChartTooltip
               cursor={false}
-              content={
-                <ChartTooltipContent
-                  labelFormatter={(value, payload) => {
-                    const raw = payload?.[0]?.payload?.date ?? value
-                    return new Date(raw).toLocaleDateString("en-UK", {
-                      month: "short",
-                      day: "numeric",
-                    })
-                  }}
-                  indicator="dot"
-                />
-              }
+              content={<ChartTooltipContent indicator="line" />}
             />
             <Area
               dataKey="wordcount"
-              type="monotone"
-              fill="url(#fillWordcount)"
+              type="natural"
+              fill="var(--color-wordcount)"
+              fillOpacity={0.4}
               stroke="var(--color-wordcount)"
             />
           </AreaChart>

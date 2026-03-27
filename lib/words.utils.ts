@@ -30,7 +30,7 @@ export const getWords = async (userId: string, projectId: string, date: string):
  * @param projectId string
  * @returns Words
  */
-export const getAllWords = async (userId: string, projectId: string): Promise<Words[] | null> => {
+export const getAllWordsGivenProject = async (userId: string, projectId: string): Promise<Words[] | null> => {
   const wordsUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/words/user/${userId}/${projectId}`;
   const fetchedWords = await fetch(wordsUrl);
 
