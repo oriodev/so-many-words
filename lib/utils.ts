@@ -146,6 +146,11 @@ export function getActualDailyWordcounts(wordCounts: Words[], startDate: string,
   return actualDailyWordcounts;
 }
 
+/**
+ * Maps a years worth of wordcounts to the day they were written
+ * @param wordcounts 
+ * @returns { date: Date, wordcount: number }[] 
+ */
 export function get356DayWordcounts(wordcounts: Words[]): { date: Date, wordcount: number }[] {
   const date = new Date();
   const startDate = subDays(date, 365);

@@ -1,5 +1,5 @@
-import { Field, FieldLabel } from "./ui/field";
-import { Progress } from "./ui/progress";
+import { Field, FieldLabel } from "../ui/field";
+import { Progress } from "../ui/progress";
 
 interface WordcountProgressBarProps {
   percentageComplete: number;

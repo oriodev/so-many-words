@@ -5,6 +5,9 @@ import { getUser } from "./user.api";
 import { endOfWeek, format, parseISO, startOfWeek, subDays, subMonths, subYears } from "date-fns";
 import { createClient } from "@/lib/supabase/server";
 
+// CLEAN UP LIST
+// return error messages for all api calls
+
 /**
  * Gets a days wordcount given a user id, project slug, and date
  * @param userId string

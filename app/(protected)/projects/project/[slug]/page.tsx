@@ -1,5 +1,5 @@
-import ProjectTabs from "@/components/project-tabs";
-import { SiteHeader } from "@/components/site-header";
+import ProjectTabs from "@/components/misc/project-tabs";
+import { SiteHeader } from "@/components/misc/site-header";
 import { getProject } from "@/api/project.api";
 import { getUser } from "@/api/user.api";
 import { redirect } from "next/navigation";

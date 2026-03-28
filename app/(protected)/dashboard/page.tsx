@@ -1,9 +1,9 @@
-import { ChartAreaInteractive } from "@/components/chart-area-interactive"
+import { ChartAreaInteractive } from "@/components/misc/chart-area-interactive"
 // import { DataTable } from "@/components/data-table"
-import { DashboardWordTotalCards } from "@/components/section-cards"
+import { DashboardWordTotalCards } from "@/components/misc/section-cards"
 
 // import data from "./data.json"
-import { SiteHeader } from "@/components/site-header"
+import { SiteHeader } from "@/components/misc/site-header"
 import { getAllTimeTotalWordcount } from "@/api/project.api";
 import { getUser } from "@/api/user.api";
 import { AllDashboardData } from "@/types";
@@ -11,7 +11,6 @@ import { redirect } from "next/navigation";
 import { getAllWordsGivenTime, getTotalWordcountGivenDate } from "@/api/words.api";
 import { startOfMonth, startOfWeek, startOfYear, subDays, subMonths, subWeeks, subYears } from "date-fns";
 import { get356DayWordcounts } from "@/lib/utils";
-import { DashboardChart } from "@/components/dashboard-chart";
 
 export default async function Dashboard() {
   
@@ -40,6 +39,7 @@ export default async function Dashboard() {
   const lastWeekTotalWordcount = await getTotalWordcountGivenDate(lastWeekStart, 'week') || 0;
   const yesterdayTotalWordcount = await getTotalWordcountGivenDate(yesterdayStart, 'day') || 0;
 
+  // Years word counts mapped to dates
   const yearDaysWordcountsFullAray = yearDaysWordcounts ? get356DayWordcounts(yearDaysWordcounts) : [];
 
   const dashboardData: AllDashboardData = {
@@ -63,9 +63,7 @@ export default async function Dashboard() {
             <DashboardWordTotalCards dashboardData={dashboardData} user={user}/>
             <div className="px-4 lg:px-6">
               <ChartAreaInteractive data={yearDaysWordcountsFullAray}/>
-              {/* <DashboardChart data={yearDaysWordcountsFullAray} */}
             </div>
-            {/* <DataTable data={data} /> */}
           </div>
         </div>
       </div>

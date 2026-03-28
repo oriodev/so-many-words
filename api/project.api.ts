@@ -4,6 +4,9 @@ import { Project, ProjectSchema } from "@/types";
 import { getUser } from "@/api/user.api";
 import { createClient } from "@/lib/supabase/server";
 
+// CLEAN UP LIST
+// return error messages for all api calls
+
 /**
  * Gets all projects given a user id. Returns [] on failure.
  * @param userId string
@@ -76,16 +79,16 @@ export const getProject = async (userId: string, slug: string): Promise<Project 
  * Creates a project
  * @param data ProjectSchema { title, description }
  */
-export const createProject = async (data: ProjectSchema): Promise<void | null> => {
+export const createProject = async (data: ProjectSchema): Promise<void | Error> => {
   const user = await getUser();
-  if (!user) return null;
+  if (!user) return Error('Not authenticated');
 
   const { title, description, wordcountGoal, projectStartDate, projectEndDate } = data;
 
   
   if (!title) {
     console.log('Error: Missing title');
-    return null;
+    return Error('Missing title');
   }
   
   const supabase = await createClient();
@@ -93,19 +96,21 @@ export const createProject = async (data: ProjectSchema): Promise<void | null> =
   const { data: createdProject, error } = await supabase
     .from('projects')
     .insert([
-      { title, 
-        description, 
-        wordcount_goal: wordcountGoal, 
-        project_start_date: projectStartDate, 
-        project_end_date: projectEndDate, 
-        user_id: user.id  },
+      {
+        title,
+        description,
+        wordcount_goal: wordcountGoal,
+        project_start_date: projectStartDate,
+        project_end_date: projectEndDate,
+        user_id: user.id,
+      },
     ])
     .select()
     .single();
 
   if (error) {
-    console.log('Error: ', error);
-    return null;
+    if (error.code === '23505') return Error("You can't have two projects with the same name");
+    return Error(error.message || 'An unexpected error occurred');
   }
 
   return createdProject;

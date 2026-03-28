@@ -1,5 +1,5 @@
 import { EditProfileForm } from "@/components/forms/edit-profile-form";
-import { SiteHeader } from "@/components/site-header";
+import { SiteHeader } from "@/components/misc/site-header";
 import { getUser } from "@/api/user.api";
 import { redirect } from "next/navigation";
 

@@ -3,6 +3,9 @@
 import { createClient } from "@/lib/supabase/server";
 import { User } from "@/types";
 
+// CLEAN UP LIST
+// return error messages for all api calls
+
 /**
  * Gets user data for logged in user.
  * @returns User | null

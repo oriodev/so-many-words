@@ -1,5 +1,5 @@
 import { EditProjectForm } from "@/components/forms/edit-project-form";
-import { SiteHeader } from "@/components/site-header";
+import { SiteHeader } from "@/components/misc/site-header";
 import { getProject } from "@/api/project.api";
 import { getUser } from "@/api/user.api";
 import { redirect } from "next/navigation";

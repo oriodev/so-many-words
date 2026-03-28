@@ -78,7 +78,7 @@ export function CreateProjectForm() {
     },
   })
 
-  const { watch } = form;
+  const { watch, setError } = form;
   const projectStartDate = watch("projectStartDate");
   const projectEndDate = watch("projectEndDate");
   const wordcountGoal = watch("wordcountGoal");
@@ -98,11 +98,20 @@ export function CreateProjectForm() {
       ...data
     };
     
-    const project = await createProject(payload) as Project | null;
-    if (project) {
-      addProject(project);
-      router.push(`/projects/project/${project.slug}`);
+    const response = await createProject(payload) as Project | Error | null;
+    
+    if (!response) {
+      setError('title', { type: 'server', message: 'Unknown error' });
+      return;
     }
+
+    if (response instanceof Error) {
+      setError('title', { type: 'server', message: response.message });
+      return;
+    }
+
+    addProject(response);
+    router.push(`/projects/project/${response.slug}`);
 
   }
 

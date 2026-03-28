@@ -29,7 +29,7 @@ import z from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createWords, updateWord } from "@/api/words.api";
-import { WordcountProgressBar } from "../wordcount-progress-bar";
+import { WordcountProgressBar } from "../misc/wordcount-progress-bar";
 
 // PROPS
 interface DailyProgressCardProps {

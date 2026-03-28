@@ -1,4 +1,4 @@
-import { SiteHeader } from "@/components/site-header";
+import { SiteHeader } from "@/components/misc/site-header";
 import { Button } from "@/components/ui/button";
 import { getUser } from "@/api/user.api";
 import Link from "next/link";

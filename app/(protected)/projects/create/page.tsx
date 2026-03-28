@@ -1,5 +1,5 @@
 import { CreateProjectForm } from "@/components/forms/create-project-form";
-import { SiteHeader } from "@/components/site-header";
+import { SiteHeader } from "@/components/misc/site-header";
 
 export default async function CreateProject() {
 

@@ -2,10 +2,10 @@
 
 import * as React from "react"
 
-import { NavDocuments } from "@/components/nav-documents"
-import { NavMain } from "@/components/nav-main"
-import { NavSecondary } from "@/components/nav-secondary"
-import { NavUser } from "@/components/nav-user"
+import { NavDocuments } from "@/components/misc/nav-documents"
+import { NavMain } from "@/components/misc/nav-main"
+import { NavSecondary } from "@/components/misc/nav-secondary"
+import { NavUser } from "@/components/misc/nav-user"
 import {
   Sidebar,
   SidebarContent,

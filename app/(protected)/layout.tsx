@@ -1,5 +1,5 @@
 import { getUser } from "@/api/user.api";
-import { AppSidebar } from "@/components/app-sidebar";
+import { AppSidebar } from "@/components/misc/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { getProjects } from "@/api/project.api";
 import { redirect } from "next/navigation";

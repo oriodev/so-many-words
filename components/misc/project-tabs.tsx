@@ -20,10 +20,10 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import ProjectGoalsCard from "./cards/project-goals-card";
-import ProjectProgressCard from "./cards/project-progress-card";
-import DailyProgressCard from "./cards/daily-progress.card";
-import DailyProgressChartCard from "./cards/daily-progress-chart-card";
+import ProjectGoalsCard from "../cards/project-goals-card";
+import ProjectProgressCard from "../cards/project-progress-card";
+import DailyProgressCard from "../cards/daily-progress.card";
+import DailyProgressChartCard from "../cards/daily-progress-chart-card";
 
 // NOT COMPONENTS
 import { useState } from "react";
@@ -53,8 +53,7 @@ export default function ProjectTabs ({ userId, project, allWordcounts }: Project
   
   // HANDLE DELETE AND EDIT FUNCTIONS
   const handleDelete = async () => {
-    const response = await deleteProject(userId, slug);
-    if (!response) return;
+    await deleteProject(userId, slug);
     deleteProjectFromStore(slug);
     
     redirect('/dashboard');
